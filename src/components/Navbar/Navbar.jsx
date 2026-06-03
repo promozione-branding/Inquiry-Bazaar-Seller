@@ -21,8 +21,8 @@ export default function Navbar() {
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     dispatch(logout());
-    setProfileOpen(false)
     router.push("/");
+    setProfileOpen(false)
   };
 
   useEffect(() => {
