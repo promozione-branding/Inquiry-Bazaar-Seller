@@ -2,21 +2,18 @@ import React from "react";
 
 export default function FormSection() {
     return (
-        <div
-            className="min-h-[70vh] bg-cover bg-center bg-no-repeat flex items-center"
-            style={{
-                backgroundImage: "url('/banner.webp')", // your image path
-            }}
-        >
-            <div className="max-w-7xl mx-auto w-full px-6">
+        <div className="h-[80vh] md:h-[70vh] bg-cover bg-center bg-no-repeat flex md:items-center items-start"
+            style={{ backgroundImage: "url('/banner.webp')", }}>
+
+            <div className="max-w-7xl mx-auto w-full px-4">
                 <div className="grid md:grid-cols-2 gap-10 items-center">
 
                     {/* Left side empty for image visibility */}
                     <div></div>
 
                     {/* Right Side Form */}
-                    <div className="bg-white/95 p-8 rounded-xl shadow-xl">
-                        <h1 className="text-4xl font-bold leading-tight mb-6">
+                    <div className="bg-white/95 p-4 md:p-8 rounded-xl shadow-xl">
+                        <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-6">
                             Sell for free
                             <span className="font-normal">
                                 {" "}on India's largest online B2B marketplace
@@ -28,18 +25,20 @@ export default function FormSection() {
                         </h2>
 
                         <form className="flex flex-col sm:flex-row overflow-hidden rounded-lg shadow-md bg-white border">
-                            <div className="flex items-center px-4 border-r border-gray-300">
-                                <span className="text-lg">+91</span>
+                            <div className="flex items-center w-full py-4">
+                                <div className="flex items-center px-2 md:px-4 border-r border-gray-300">
+                                    <span className="text-lg">+91</span>
+                                </div>
+
+                                <input
+                                    type="tel"
+                                    placeholder="Enter 10 digit mobile number"
+                                    className="flex-1 px-2 md:px-5 outline-none text-lg"
+                                />
                             </div>
 
-                            <input
-                                type="tel"
-                                placeholder="Enter 10 digit mobile number"
-                                className="flex-1 px-5 py-4 outline-none text-lg"
-                            />
-
                             <button type="submit"
-                                className="bg-[#0e2347] hover:opacity-90 text-white font-semibold px-8 py-4 transition"
+                                className="bg-[#0e2347] text-nowrap hover:opacity-90 text-white font-semibold px-8 py-4 transition"
                             >
                                 Start Selling →
                             </button>
@@ -62,7 +61,6 @@ export default function FormSection() {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
