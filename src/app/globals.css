@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 12px;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 16px;
+}
+
+.input {
+  @apply border p-2 rounded-md w-full border-blue-300 focus:outline-none focus:ring-1 focus:ring-blue-400;
+}
+
+.label {
+  @apply block text-sm font-medium text-gray-600 mb-1;
+}
+
+.icon {
+  @apply absolute left-2 top-3 text-[#0a5183];
+}
+
+.socialIcon {
+  @apply w-9 h-9 flex items-center justify-center rounded-full bg-[#f1f7fb] text-[#0a5183] hover:bg-[#0a5183] hover:text-white transition cursor-pointer;
+}
+
+.icon-btn-blue {
+  @apply w-10 h-10 flex items-center justify-center rounded-md 
+  bg-[#074977]/10 text-[#074977] 
+  hover:bg-[#074977] hover:text-white transition;
+}
+
+.icon-btn-red {
+  @apply w-10 h-10 flex items-center justify-center rounded-md 
+  bg-[#D01132]/10 text-[#D01132] 
+  hover:bg-[#D01132] hover:text-white transition;
+}
+
+.icon-btn-danger {
+  @apply w-10 h-10 flex items-center justify-center rounded-md 
+  bg-red-100 text-red-600 
+  hover:bg-red-500 hover:text-white transition;
+}
+
+.mini-btn-blue {
+  @apply w-8 h-8 flex items-center justify-center rounded 
+  bg-[#074977]/10 text-[#074977] 
+  hover:bg-[#074977] hover:text-white transition;
+}
+
+.mini-btn-danger {
+  @apply w-8 h-8 flex items-center justify-center rounded 
+  bg-red-100 text-red-600 
+  hover:bg-red-500 hover:text-white transition;
+}
