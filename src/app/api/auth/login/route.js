@@ -81,7 +81,7 @@ export async function POST(req) {
       },
     });
 
-    response.cookies.set("promote_bharat_token", token, {
+    response.cookies.set("inquiry_bazaar_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

@@ -8,7 +8,7 @@ export default function AboutSection() {
         <div className="w-full flex justify-center">
           <Image
             src="/wordMap.webp"
-            alt="Promote Bharat"
+            alt="Inquiry Bazaar"
             width={600}
             height={400}
             className="rounded-xl shadow-lg"

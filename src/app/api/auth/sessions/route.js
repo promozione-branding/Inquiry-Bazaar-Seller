@@ -11,7 +11,7 @@ export async function GET() {
     const cookieStore = await cookies();
 
     const token =
-      cookieStore.get("promote_bharat_token")?.value;
+      cookieStore.get("inquiry_bazaar_token")?.value;
 
     if (!token) {
       return NextResponse.json(

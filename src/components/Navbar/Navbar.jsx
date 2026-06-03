@@ -48,7 +48,7 @@ export default function Navbar() {
         <Link href="/">
           <Image
             src="/Logo/logoo.webp"
-            alt="Promote Bharat"
+            alt="Inquiry Bazaar"
             width={200}
             height={200}
             className="object-contain h-19 w-50"

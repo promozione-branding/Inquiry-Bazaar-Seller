@@ -9,7 +9,7 @@ export async function POST() {
     await connectDB();
 
     const cookieStore = await cookies();
-    const token = cookieStore.get("promote_bharat_token")?.value;
+    const token = cookieStore.get("inquiry_bazaar_token")?.value;
 
     // 🔐 If token exists → delete session too
     if (token) {
@@ -30,7 +30,7 @@ export async function POST() {
       message: "Logout successful",
     });
 
-    response.cookies.set("promote_bharat_token", "", {
+    response.cookies.set("inquiry_bazaar_token", "", {
       path: "/",
       maxAge: 0,
     });

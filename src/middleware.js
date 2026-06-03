@@ -20,7 +20,7 @@ export async function middleware(req) {
     return NextResponse.next();
   }
 
-  const token = req.cookies.get("promote_bharat_token")?.value;
+  const token = req.cookies.get("inquiry_bazaar_token")?.value;
 
   // LOGIN / REGISTER PAGES
   if (AUTH_ROUTES.includes(pathname)) {

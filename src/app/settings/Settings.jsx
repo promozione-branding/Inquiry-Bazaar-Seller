@@ -41,8 +41,8 @@ export default function Settings() {
     {
       id: "disable-account",
       title: "Disable Account",
-      description: "This will remove your account from Promote Bharat.",
-      icon: <LuTrash2 size={22} />,
+      description: "This will remove your account from Inquiry Bazaar.",
+      icon: <LuTrash2 size={22} />, 
       button: "Disable",
       color: "red",
     },
