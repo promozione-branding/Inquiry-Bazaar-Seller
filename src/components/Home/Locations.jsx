@@ -39,13 +39,13 @@ const card = {
 
 export default function Locations() {
     return (
-        <div className="px-4 py-12 md:px-12 w-full bg-white">
+        <div className="px-2 py-10 md:px-12 w-full bg-white">
             <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 viewport={{ once: false }}
-                className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center"
+                className="text-2xl md:text-4xl font-bold text-gray-900 mb-5 text-center"
             >
                 Find Suppliers from Top Cities
             </motion.h2>
@@ -56,7 +56,7 @@ export default function Locations() {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: false }}
-                className="bg-gray-100 p-6 rounded-2xl grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"
+                className="bg-gray-100 p-2 lg:p-6 rounded-2xl grid grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-6"
             >
                 {locations.map((loc, index) => (
                     <motion.div
@@ -64,9 +64,9 @@ export default function Locations() {
                         variants={card}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="bg-white rounded-xl shadow-md p-5 flex flex-col items-center justify-center group cursor-pointer transition-all"
+                        className="bg-white rounded-md lg:rounded-xl shadow-md p-2 lg:p-5 flex flex-col items-center justify-center group cursor-pointer transition-all"
                     >
-                        <div className="w-14 h-14 relative mb-3">
+                        <div className="h-10 w-10 lg:w-14 lg:h-14 relative mb-3">
                             <Image
                                 src={loc.image}
                                 alt={loc.name}
@@ -74,7 +74,7 @@ export default function Locations() {
                                 className="object-contain"
                             />
                         </div>
-                        <p className="text-gray-800 font-medium group-hover:text-orange-500">{loc.name}</p>
+                        <p className="lg:text-gray-800 text-orange-500 lg:text-base text-sm font-medium group-hover:text-orange-500">{loc.name}</p>
                     </motion.div>
                 ))}
             </motion.div>

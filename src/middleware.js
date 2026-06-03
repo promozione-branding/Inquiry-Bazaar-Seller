@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-const AUTH_ROUTES = ["/", "/login", "/register"];
+const AUTH_ROUTES = ["/","/forgot-password", "/login", "/register"];
 
 async function verifyToken(token) {
   try {

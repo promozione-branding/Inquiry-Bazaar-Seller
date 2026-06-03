@@ -3,6 +3,7 @@ import Carousel from "@/components/Home/Carousel";
 import ClienteleSlider from "@/components/Home/ClientSlider";
 import FormSection from "@/components/Home/FormSection";
 import Locations from "@/components/Home/Locations";
+import TestimonialSection from "@/components/Home/Testimonial";
 import Image from "next/image";
 
 export default function Home() {
@@ -12,6 +13,7 @@ export default function Home() {
       <FormSection />
       <AboutSection />
       <ClienteleSlider />
+      <TestimonialSection />
       <Locations />
     </div>
   );
