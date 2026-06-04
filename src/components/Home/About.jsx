@@ -5,13 +5,13 @@ export default function AboutSection() {
   return (
     <section className="w-full py-10 bg-gray-50">
       <div className="md:px-15 mx-auto px-4 grid md:grid-cols-2 gap-5 items-center">
-        <div className="w-full flex justify-center">
+        <div className="w-full flex justify-center bg-transparent">
           <Image
-            src="/wordMap.webp"
+            src="/map.png"
             alt="Inquiry Bazaar"
-            width={600}
+            width={500}
             height={400}
-            className="rounded-xl shadow-lg"
+            className="object-cover h-120"
           />
         </div>
 
