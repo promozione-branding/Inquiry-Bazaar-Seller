@@ -20,6 +20,13 @@ export async function POST(req) {
       );
     }
 
+    if (user.role !== "supplier") {
+      return NextResponse.json(
+        { success: false, message: "Supplier profile not found" },
+        { status: 400 }
+      );
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
