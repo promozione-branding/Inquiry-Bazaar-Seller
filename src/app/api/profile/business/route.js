@@ -20,6 +20,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    body.serviceLocations = [...(body.serviceLocations || []), body.city,].filter(Boolean);
+    body.serviceLocations = [...new Set(body.serviceLocations)];
+
     const business = await upsertBusiness(userId, body);
 
     return NextResponse.json({

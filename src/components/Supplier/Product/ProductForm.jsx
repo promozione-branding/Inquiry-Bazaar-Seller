@@ -118,6 +118,25 @@ export default function ProductForm({ activeTab, form, setForm }) {
                     />
 
                     <SelectInput
+                        label="Unit"
+                        Icon={List}
+                        name="unit"
+                        value={form.unit}
+                        onChange={handleChange}
+                        options={[
+                            { label: "Piece", value: "Piece" },
+                            { label: "Kg", value: "Kg" },
+                            { label: "Gram", value: "Gram" },
+                            { label: "Meter", value: "Meter" },
+                            { label: "Litre", value: "Litre" },
+                            { label: "Roll", value: "Roll" },
+                            { label: "Pack", value: "Pack" },
+                            { label: "Ton", value: "Ton" },
+                            { label: "Box", value: "Box" },
+                        ]}
+                    />
+
+                    <SelectInput
                         label="Price Type"
                         Icon={List}
                         name="priceType"

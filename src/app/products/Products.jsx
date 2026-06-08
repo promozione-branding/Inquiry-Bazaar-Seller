@@ -38,6 +38,7 @@ export default function Products() {
     categoryId: "",
     subCategoryId: "",
     price: "",
+    unit: "",
     priceType: "on_request",
     minOrderQty: 1,
     description: description,
@@ -153,6 +154,7 @@ export default function Products() {
       categoryId: item.categoryId || "",
       subCategoryId: item.subCategoryId || "",
       price: item.price || "",
+      unit: item.unit || "",
       priceType: item.priceType || "on_request",
       minOrderQty: item.minOrderQty || 1,
       description: item.description || "",
@@ -199,6 +201,7 @@ export default function Products() {
       categoryId: "",
       subCategoryId: "",
       price: "",
+      unit: "",
       priceType: "on_request",
       minOrderQty: 1,
       description: "",
@@ -239,7 +242,7 @@ export default function Products() {
       <div className="flex items-center gap-2 w-full md:w-auto">
         <select name="" className='input py-2.5! text-gray-600'>
           <option value="">Select Category</option>
-          <option value="">Ball Pens</option>
+          {/* <option value="">Ball Pens</option> */}
         </select>
         <div className="relative w-full">
           <Search

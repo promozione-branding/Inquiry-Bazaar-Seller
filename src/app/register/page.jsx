@@ -41,15 +41,15 @@ export default function SellerRegister() {
 
     try {
       const res = await axios.post("/api/auth/register", { ...form, role: "supplier", });
-      // if (res.success) {
-      const res1 = await fetch("/api/auth/me");
-      const data1 = await res1.json();
-      if (data1.user) {
-        dispatch(setUser(data1.user));
-        toast.success("Registered Successfully");
-        router.push("/profile");
+      if (res.data.success) {
+        const res1 = await fetch("/api/auth/me");
+        const data1 = await res1.json();
+        if (data1.user) {
+          dispatch(setUser(data1.user));
+          toast.success("Registered Successfully");
+          router.push("/profile");
+        }
       }
-      // }
     } catch (error) {
       toast.error(error.response?.data?.message || "Registration Failed");
     }

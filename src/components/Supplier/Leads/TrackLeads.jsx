@@ -83,9 +83,7 @@ export default function TrackLeads({ user, filter }) {
             try {
                 setLoading(true);
 
-                const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/tracking/events/supplier/${user?._id}?filter=${filter}`
-                );
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/tracking/events/supplier/${user?._id}?filter=${filter}`);
 
                 if (response.data.success) {
                     setTrackingData(response.data.data || []);

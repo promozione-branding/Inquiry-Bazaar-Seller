@@ -11,7 +11,9 @@ import {
     IndianRupee,
     Users,
 } from "lucide-react";
-import { ownershipTypes, businessTypes, businessField, employeNumber } from "@/Data/data";
+import { ownershipTypes, businessTypes, businessField, employeNumber, locations } from "@/Data/data";
+import Input from "@/components/Inputs/FormInput";
+import SelectInput from "@/components/Inputs/SelectInput";
 
 export default function BusinessForm({ user, setBusinessDetails }) {
     const [loading, setLoading] = useState(false);
@@ -28,6 +30,11 @@ export default function BusinessForm({ user, setBusinessDetails }) {
         annualTurnover: "",
         numberOfEmployees: "",
         address: "",
+        state: "",
+        city: "",
+        serviceLocations: [
+            ""
+        ],
     });
 
     const fetchIndustryList = async () => {
@@ -92,6 +99,10 @@ export default function BusinessForm({ user, setBusinessDetails }) {
     // if (fetching) {
     //     return <p className="text-center py-10">Loading...</p>;
     // }
+
+    const selectedState = locations.find(
+        (item) => item.state === form.state
+    );
 
     return (
         <div className="grid md:grid-cols-2 gap-4">
@@ -195,6 +206,30 @@ export default function BusinessForm({ user, setBusinessDetails }) {
 
             <Input label="Annual Turnover" icon={<IndianRupee size={17} />} name="annualTurnover" value={form.annualTurnover} onChange={handleChange} />
 
+            <SelectInput
+                label="State"
+                Icon={MapPin}
+                name="state"
+                value={form.state}
+                onChange={handleChange}
+                options={locations.map((c) => ({
+                    label: c.state,
+                    value: c.state,
+                }))}
+            />
+
+            <SelectInput
+                label="City"
+                Icon={MapPin}
+                name="city"
+                value={form.city}
+                onChange={handleChange}
+                options={(selectedState?.cities || []).map((city) => ({
+                    label: city,
+                    value: city,
+                }))}
+            />
+
             <div>
                 <label className="label">Business Address</label>
                 <div className="relative">
@@ -218,19 +253,6 @@ export default function BusinessForm({ user, setBusinessDetails }) {
                 >
                     {loading ? "Saving..." : "Save"}
                 </button>
-            </div>
-        </div>
-    );
-}
-
-/* Input Component */
-function Input({ label, icon, type = "text", ...props }) {
-    return (
-        <div>
-            <label className="label">{label}</label>
-            <div className="relative">
-                <div className="icon">{icon}</div>
-                <input type={type} className="input pl-8!" {...props} placeholder={label} />
             </div>
         </div>
     );

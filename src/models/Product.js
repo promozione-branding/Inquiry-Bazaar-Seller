@@ -40,6 +40,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
     },
 
+    unit: {
+      type: String,
+    },
+
     priceType: {
       type: String,
       enum: ["fixed", "starting", "range", "on_request"],
