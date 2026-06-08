@@ -109,7 +109,7 @@ export default function ProductForm({ activeTab, form, setForm }) {
             {activeTab === "price" && (
                 <div className="grid md:grid-cols-2 gap-4">
                     <Input
-                        label="Price"
+                        label="New Price"
                         type="number"
                         Icon={IndianRupee}
                         name="price"
@@ -118,7 +118,7 @@ export default function ProductForm({ activeTab, form, setForm }) {
                     />
 
                     <Input
-                        label="Price"
+                        label="Old Price"
                         type="number"
                         Icon={IndianRupee}
                         name="oldPrice"
