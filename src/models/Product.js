@@ -40,6 +40,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
     },
 
+    oldPrice: {
+      type: Number,
+    },
+
     unit: {
       type: String,
     },

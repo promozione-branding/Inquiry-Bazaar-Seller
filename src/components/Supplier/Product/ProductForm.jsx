@@ -117,6 +117,15 @@ export default function ProductForm({ activeTab, form, setForm }) {
                         onChange={handleChange}
                     />
 
+                    <Input
+                        label="Price"
+                        type="number"
+                        Icon={IndianRupee}
+                        name="oldPrice"
+                        value={form.oldPrice}
+                        onChange={handleChange}
+                    />
+
                     <SelectInput
                         label="Unit"
                         Icon={List}
