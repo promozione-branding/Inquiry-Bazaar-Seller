@@ -22,7 +22,7 @@ export default function Navbar() {
     await axios.post("/api/auth/logout");
     dispatch(logout());
     await router.push("/");
-    // window.location.reload();
+    window.location.reload();
     setProfileOpen(false)
   };
 
