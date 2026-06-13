@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import { Toaster } from "react-hot-toast";
 import ReduxProvider from "@/redux/ReduxProvider";
+import Stickyfooter from "@/components/Footer/StickyFooter";
 
 export const metadata = {
   title: "Seller - Inquiry Bazaar",
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           <Toaster position="top-center" />
           {children}
+          <Stickyfooter />
           <Footer />
         </ReduxProvider>
       </body>

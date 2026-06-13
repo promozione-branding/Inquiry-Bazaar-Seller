@@ -48,7 +48,7 @@ export default function SupplierSidebar() {
       <aside className={`bg-white border-r border-gray-300 shadow-sm h-screen fixed md:static top-0 left-0 z-50 md:z-40
         transition-all duration-300  ${open ? "translate-x-0" : "-translate-x-full"}  md:translate-x-0 w-60`}>
           
-        <div className="flex justify-end p-3 md:hidden">
+        <div className="flex justify-end p-3 md:hidden border-b border-gray-300">
           <button onClick={() => setOpen(false)}>
             <X size={24} />
           </button>

@@ -29,7 +29,7 @@ export default function ProductGrid({ products = [], loading, handleEdit, handle
                             />
                         </div>
 
-                        <Link href={`/supplier/products/${item?.slug}`} className="font-bold text-black text-lg px-1.5">
+                        <Link href={`/products/${item?.slug}`} className="font-bold text-black text-lg px-1.5">
                             {item.name}
                         </Link>
 

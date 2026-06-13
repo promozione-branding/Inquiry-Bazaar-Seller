@@ -46,7 +46,7 @@ export default function Footer() {
     const [message, setMessage] = useState("");
 
     return (
-        <footer className="w-full pb-20 md:pb-0 text-[13px] leading-[1.4] text-black">
+        <footer className="w-full text-[13px] leading-[1.4] text-black">
             <div className="bg-[#1e3a5f] text-white px-4 sm:px-6 md:px-10 py-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="flex gap-3 items-start">
