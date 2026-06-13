@@ -26,11 +26,14 @@ import {
   Youtube,
   MessageCircle,
   PhoneCall,
+  Twitter,
+  Linkedin,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { FaWhatsapp } from "react-icons/fa";
 
 export default function Dashboard() {
   const { user } = useSelector((state) => state.auth);
@@ -310,7 +313,7 @@ export default function Dashboard() {
 
           <motion.div variants={card} initial="hidden" animate="show" transition={{ delay: 0.5 }}
             className="rounded-3xl bg-white border border-slate-200 px-4 py-3 shadow-sm">
-            <h2 className="font-bold text-xl mb- text-center text-slate-800">
+            <h2 className="font-bold text-lg mb- text-center text-slate-800">
               Company Profile
             </h2>
             <div className="flex items-center gap-4">
@@ -384,18 +387,10 @@ export default function Dashboard() {
                 </p>
 
                 <div className="flex gap-2 justify-center">
-
                   {businessDetails?.social?.whatsapp && (
                     <a href={businessDetails.social.whatsapp} target="_blank"
                       className="w-11 h-11 rounded-xl bg-green-50 text-green-600 flex items-center justify-center hover:scale-105">
-                      <MessageCircle />
-                    </a>
-                  )}
-
-                  {businessDetails?.social?.instagram && (
-                    <a href={businessDetails.social.instagram} target="_blank"
-                      className="w-11 h-11 rounded-xl bg-pink-50 text-pink-600  flex items-center justify-center hover:scale-105">
-                      <Instagram />
+                      <FaWhatsapp size={25} />
                     </a>
                   )}
 
@@ -412,6 +407,29 @@ export default function Dashboard() {
                       <Youtube />
                     </a>
                   )}
+
+                  {businessDetails?.social?.linkedin &&
+                    <a
+                      href={businessDetails?.social?.linkedin || "#"}
+                      target="_blank"
+                      className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:scale-105">
+                      <Linkedin size={18} />
+                    </a>}
+
+                  {businessDetails?.social?.instagram && (
+                    <a href={businessDetails.social.instagram} target="_blank"
+                      className="w-11 h-11 rounded-xl bg-pink-50 text-pink-600  flex items-center justify-center hover:scale-105">
+                      <Instagram />
+                    </a>
+                  )}
+
+                  {businessDetails?.social?.twitter &&
+                    <a
+                      href={businessDetails?.social?.twitter || "#"}
+                      target="_blank"
+                      className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:scale-105">
+                      <Twitter size={18} />
+                    </a>}
                 </div>
               </div>
             </div>
