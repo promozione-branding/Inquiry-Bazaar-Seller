@@ -31,18 +31,30 @@ export default function SupplierSidebar() {
 
   return (
     <>
-      {/* Sidebar */}
-      <aside className={`bg-white border-r border-gray-300 shadow-sm h-screen fixed md:static top-0 left-0 z-40
-        transition-all duration-300 ${open ? "w-60" : "w-16"} md:w-60`}>
-        <nav className="mt-18 md:mt-4 px-2 space-y-2">
-          <div className={`flex md:hidden ${open ? "justify-end" : "justify-start"} w-full`}>
-            <button className="md:hidden top-4 left-4 z-50 bg-black text-white px-2.5 py-3 rounded-md"
-              onClick={() => setOpen(!open)}
-            >
-              {open ? <X size={22} /> : <Menu size={22} />}
-            </button>
-          </div>
+      <button onClick={() => setOpen(true)}
+        className="md:hidden fixed top-6 left-2 z-50 bg-gray-200 border border-gray-300 text-black p-2 rounded-md"
+      >
+        <Menu size={22} />
+      </button>
 
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`bg-white border-r border-gray-300 shadow-sm h-screen fixed md:static top-0 left-0 z-50 md:z-40
+        transition-all duration-300  ${open ? "translate-x-0" : "-translate-x-full"}  md:translate-x-0 w-60`}>
+          
+        <div className="flex justify-end p-3 md:hidden">
+          <button onClick={() => setOpen(false)}>
+            <X size={24} />
+          </button>
+        </div>
+
+        <nav className="mt-4 px-2 space-y-2">
           {menu.map((item, i) => {
             const Icon = item.icon;
             const active = pathname === item.path;

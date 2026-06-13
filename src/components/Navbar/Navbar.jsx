@@ -45,7 +45,7 @@ export default function Navbar() {
 
   return (
     <nav className="w-full border-b border-b-gray-300 bg-white sticky top-0 z-50 h-20">
-      <div className="mx-auto md:px-6 px-2 flex items-center justify-between">
+      <div className="mx-auto md:px-6 px-4 flex items-center justify-between">
         <Link href="/">
           <Image
             src="/Logo/logoo.webp"
