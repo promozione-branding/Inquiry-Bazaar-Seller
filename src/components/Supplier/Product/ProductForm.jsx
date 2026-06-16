@@ -134,6 +134,7 @@ export default function ProductForm({ activeTab, form, setForm }) {
                         onChange={handleChange}
                         options={[
                             { label: "Piece", value: "Piece" },
+                            { label: "Pair", value: "Pair" },
                             { label: "Inch", value: "Inch" },
                             { label: "Square ft.", value: "Square ft." },
                             { label: "Kg", value: "Kg" },
