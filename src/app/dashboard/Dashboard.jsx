@@ -76,25 +76,39 @@ export default function Dashboard() {
     show: { opacity: 1, y: 0 },
   };
 
+
+
+const [showingPrevious, setShowingPrevious] = useState(false);
+
   useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        setLoading(true);
+const fetchLeads = async () => {
+  try {
+    setLoading(true);
 
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=${"today"}`
-        );
+    const todayRes = await axios.get(
+      `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=today`
+    );
 
-        if (response.data.success) {
-          setLeadsData(response.data.data || []);
-        }
-      } catch (error) {
-        console.error("Error fetching leads:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (todayRes.data.success && todayRes.data.data?.length > 0) {
+      setLeadsData(todayRes.data.data);
+      setShowingPrevious(false);
+      return;
+    }
 
+    const previousRes = await axios.get(
+      `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=all`
+    );
+
+    if (previousRes.data.success) {
+      setLeadsData(previousRes.data.data || []);
+      setShowingPrevious(true);
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
     if (user?._id) {
       fetchBusiness();
       fetchLeads();
@@ -247,21 +261,27 @@ export default function Dashboard() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          <motion.div
-            variants={card}
-            initial="hidden"
-            animate="show"
-            transition={{ delay: 0.4 }}
-            className="lg:col-span-2 bg-white rounded-3xl py-6 px-4 shadow-sm"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <MessageSquare className="text-indigo-600" />
-              <h2 className="font-bold text-xl">
-                Latest Inquiries
-              </h2>
-            </div>
+         <motion.div
+  variants={card}
+  initial="hidden"
+  animate="show"
+  transition={{ delay: 0.4 }}
+  className="lg:col-span-2 bg-white rounded-3xl py-6 px-4 shadow-sm"
+>
+  <div className="flex items-center gap-3 mb-4">
+    <MessageSquare className="text-indigo-600" />
+    <h2 className="font-bold text-xl">
+      Latest Inquiries
+    </h2>
+  </div>
 
-            {loading ? (
+  {showingPrevious && (
+    <div className="mb-4 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm">
+      No leads received today. Showing previous inquiries.
+    </div>
+  )}
+
+  {loading ? (
               // Loading Skeleton
               <div className="grid md:grid-cols-2 gap-2">
                 {[...Array(6)].map((_, i) => (

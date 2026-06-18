@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import { FaWhatsapp } from "react-icons/fa";
 export default function LeadList({ user, filter }) {
   const [leadsData, setLeadsData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,14 +116,38 @@ export default function LeadList({ user, filter }) {
                   </div>
                 </div>
 
-                <button onClick={() => window.open(`tel:${lead.phone}`)}
+                <div className="flex gap-3">
+    <button onClick={() => window.open(`tel:${lead.phone}`)}
                   className="w-10 h-10 rounded-xl bg-[#D01132]/10 hover:bg-[#D01132]/20 flex items-center justify-center transition shrink-0"
                 >
                   <Phone
-                    size={18}
+                    size={20}
                     className="text-[#D01132]"
                   />
                 </button>
+
+
+              <button
+  onClick={() =>
+    window.open(
+      `https://wa.me/${String(
+        lead.whatsapp || lead.phone
+      ).replace(/\D/g, "")}`,
+      "_blank"
+    )
+  }
+  className="w-10 h-10 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition shrink-0"
+>
+  <FaWhatsapp
+    size={23}
+    className="text-green-600"
+  />
+</button>
+
+                </div>
+
+            
+
               </div>
             </div>
 
@@ -160,7 +184,7 @@ export default function LeadList({ user, filter }) {
 
                   <div>
                     <p className="text-xs text-gray-800 mb-0.5">
-                      Phone
+                      Phone+
                     </p>
 
                     <p className="text-sm font-medium text-gray-800">
@@ -168,6 +192,9 @@ export default function LeadList({ user, filter }) {
                     </p>
                   </div>
                 </div>
+
+
+                 
 
                 {lead.email && (
                   <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-cyan-50 transition rounded-xl px-4 py-2">
