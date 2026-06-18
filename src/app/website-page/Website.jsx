@@ -196,6 +196,15 @@ export default function Website() {
                         ...data.faqSection,
                         file: null,
                     },
+
+                    featuredProducts: {
+                        ...data.featuredProducts
+                    },
+
+                    popularProducts: {
+                        ...data.popularProducts
+                    },
+
                 });
             }
         };

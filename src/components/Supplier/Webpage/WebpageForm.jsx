@@ -151,14 +151,8 @@ export default function WebpageForm({ user, saving, section, form, setForm, hand
                             multiple
                             value=""
                             onChange={(e) => {
-                                const selected = Array.from(
-                                    e.target.selectedOptions
-                                ).map((o) => o.value);
-
-                                handleProductSelect(
-                                    "featuredProducts",
-                                    selected
-                                );
+                                const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
+                                handleProductSelect("featuredProducts", selected);
                             }}
                             options={products.map((p) => ({
                                 label: p.name,
@@ -221,14 +215,8 @@ export default function WebpageForm({ user, saving, section, form, setForm, hand
                                     className="input pl-8! p-2.5! h-[100px]"
                                     value={[]}
                                     onChange={(e) => {
-                                        const selected = Array.from(
-                                            e.target.selectedOptions
-                                        ).map((o) => o.value);
-
-                                        handleProductSelect(
-                                            "popularProducts",
-                                            selected
-                                        );
+                                        const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
+                                        handleProductSelect("popularProducts", selected);
                                     }}
                                 >
                                     {products.map((p) => (
