@@ -26,13 +26,29 @@ export async function POST(req) {
         }
 
         // ✅ Parse JSON fields
-        const hero = JSON.parse(formData.get("hero"));
-        const about = JSON.parse(formData.get("about"));
-        const work = JSON.parse(formData.get("work"));
-        const cta = JSON.parse(formData.get("cta"));
-        const faqSection = JSON.parse(formData.get("faqSection"));
-        const featuredProducts = JSON.parse(formData.get("featuredProducts"));
-        const popularProducts = JSON.parse(formData.get("popularProducts"));
+        const safeParse = (value, fallback = {}) => {
+            try {
+                return value ? JSON.parse(value) : fallback;
+            } catch {
+                return fallback;
+            }
+        };
+
+        const hero = safeParse(formData.get("hero"));
+        const about = safeParse(formData.get("about"));
+        const work = safeParse(formData.get("work"));
+        const cta = safeParse(formData.get("cta"));
+        const faqSection = safeParse(formData.get("faqSection"), { faqs: [] });
+
+        const featuredProducts = safeParse(
+            formData.get("featuredProducts"),
+            { heading: "", subHeading: "", products: [] }
+        );
+
+        const popularProducts = safeParse(
+            formData.get("popularProducts"),
+            { heading: "", subHeading: "", products: [] }
+        );
 
         // ✅ Files
         const heroFile = formData.get("heroImage");

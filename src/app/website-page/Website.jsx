@@ -101,14 +101,10 @@ export default function Website() {
 
         const saveWebpage = async () => {
             const formData = new FormData();
-
             formData.append("userId", user._id);
-
-            // ❗ Remove file before sending JSON
             const hero = { ...form.hero };
             const about = { ...form.about };
             const faqSection = { ...form.faqSection };
-
             delete hero.file;
             delete about.file;
             delete faqSection.file;
@@ -118,17 +114,29 @@ export default function Website() {
             formData.append("work", JSON.stringify(form.work));
             formData.append("cta", JSON.stringify(form.cta));
             formData.append("faqSection", JSON.stringify(faqSection));
-            formData.append("featuredProducts", JSON.stringify(form.featuredProducts));
-            formData.append("popularProducts", JSON.stringify(form.popularProducts));
-            // ✅ Files
+            formData.append(
+                "featuredProducts",
+                JSON.stringify(form?.featuredProducts || {
+                    heading: "",
+                    subHeading: "",
+                    products: [],
+                })
+            );
+
+            formData.append(
+                "popularProducts",
+                JSON.stringify(form?.popularProducts || {
+                    heading: "",
+                    subHeading: "",
+                    products: [],
+                })
+            );
             if (form.hero.file) formData.append("heroImage", form.hero.file);
             if (form.about.file) formData.append("aboutImage", form.about.file);
             if (form.faqSection.file) formData.append("faqImage", form.faqSection.file);
 
             const res = await axios.post("/api/webpage", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
+                headers: { "Content-Type": "multipart/form-data", },
             });
 
             return res.data;
@@ -138,9 +146,10 @@ export default function Website() {
             await toast.promise(saveWebpage(), {
                 loading: "Saving webpage...",
                 success: "Webpage saved successfully!",
-                error: (err) =>
-                    err?.response?.data?.message || err.message || "Failed to save webpage",
+                error: (err) => err?.response?.data?.message || err.message || "Failed to save webpage",
             });
+        } catch (err) {
+            console.log(err)
         } finally {
             setSaving(false);
         }
