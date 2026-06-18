@@ -31,6 +31,8 @@ export async function POST(req) {
         const work = JSON.parse(formData.get("work"));
         const cta = JSON.parse(formData.get("cta"));
         const faqSection = JSON.parse(formData.get("faqSection"));
+        const featuredProducts = JSON.parse(formData.get("featuredProducts"));
+        const popularProducts = JSON.parse(formData.get("popularProducts"));
 
         // ✅ Files
         const heroFile = formData.get("heroImage");
@@ -93,6 +95,8 @@ export async function POST(req) {
             work,
             cta,
             faqSection,
+            featuredProducts,
+            popularProducts,
         };
 
         // ✅ Check existing

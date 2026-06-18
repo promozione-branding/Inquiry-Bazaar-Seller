@@ -8,6 +8,7 @@ import {
     HelpCircle,
     Mail,
     Plus,
+    Package,
 } from "lucide-react";
 import WebpageImage from '@/components/Supplier/Webpage/WebpageImage';
 import WebpageForm from '@/components/Supplier/Webpage/WebpageForm';
@@ -17,6 +18,7 @@ import axios from 'axios';
 
 const sectionItems = [
     { name: "Hero Section", key: "hero", icon: Home, color: "bg-blue-100 text-blue-600" },
+    { name: "Product", key: "product", icon: Package, color: "bg-orange-100 text-orange-600" },
     { name: "About Us", key: "about", icon: Info, color: "bg-green-100 text-green-600" },
     { name: "Work Details", key: "work", icon: Briefcase, color: "bg-yellow-100 text-yellow-600" },
     { name: "CTA", key: "cta", icon: Rocket, color: "bg-purple-100 text-purple-600" },
@@ -63,6 +65,18 @@ export default function Website() {
             image: "",
             file: null,     // ✅
             faqs: [],
+        },
+
+        featuredProducts: {
+            heading: "",
+            subHeading: "",
+            products: [],
+        },
+
+        popularProducts: {
+            heading: "",
+            subHeading: "",
+            products: [],
         }
     });
 
@@ -104,7 +118,8 @@ export default function Website() {
             formData.append("work", JSON.stringify(form.work));
             formData.append("cta", JSON.stringify(form.cta));
             formData.append("faqSection", JSON.stringify(faqSection));
-
+            formData.append("featuredProducts", JSON.stringify(form.featuredProducts));
+            formData.append("popularProducts", JSON.stringify(form.popularProducts));
             // ✅ Files
             if (form.hero.file) formData.append("heroImage", form.hero.file);
             if (form.about.file) formData.append("aboutImage", form.about.file);
@@ -181,7 +196,7 @@ export default function Website() {
 
     return (<>
         <div className="py-6 px-4 w-full bg-gray-100">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {sectionItems.map((item, index) => {
                     const Icon = item.icon;
                     return (
@@ -207,6 +222,7 @@ export default function Website() {
                 />
 
                 <WebpageForm
+                    user={user}
                     saving={saving}
                     section={section}
                     setForm={setForm}
