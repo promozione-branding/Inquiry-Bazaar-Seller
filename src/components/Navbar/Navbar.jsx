@@ -31,7 +31,7 @@ export default function Navbar() {
   const fetchBusiness = async () => {
     try {
       const res = await axios.get(`/api/webpage/${user?._id}`);
-      console.log(res.data)
+      // console.log(res.data)
       if (res.data) {
         setBusinessDetails(res.data)
       }
@@ -64,9 +64,7 @@ export default function Navbar() {
     };
   }, []);
 
-
-
-  console.log(businessDetails)
+  // console.log(businessDetails)
 
   return (
     <nav className="w-full border-b border-b-gray-300 bg-white sticky top-0 z-50 h-20">

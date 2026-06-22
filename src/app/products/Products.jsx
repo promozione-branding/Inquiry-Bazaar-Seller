@@ -95,9 +95,12 @@ export default function Products() {
       }
 
       const formattedImages = updatedImages.map((img) => ({
+        mediaId: img.mediaId || null,
         url: img.url || null,
+        originalUrl: img.originalUrl || null,
         isPrimary: img.isPrimary,
         isOld: img.isOld,
+        replaced: img.replaced || false,
       }));
 
       Object.keys(form).forEach((key) => {
@@ -171,10 +174,14 @@ export default function Products() {
     });
 
     const formattedImages = item?.media.map((img) => ({
-      url: img.url || null,
+      mediaId: img._id,
+      url: img.url,
+      preview: img.url,
       isPrimary: img.isPrimary,
-      isOld: img.isOld,
+      isOld: true,
       type: img.type,
+      file: null,
+      bgRemoved: false,
     }));
     setImages(formattedImages);
     setEditId(item._id);
@@ -221,6 +228,7 @@ export default function Products() {
     setImages([])
     setEditId(null);
   };
+  console.log(products)
 
   return (<div className="p-4 md:p-6 w-full bg-gray-100">
     <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 bg-white px-4 py-3 rounded-xl shadow-sm">

@@ -26,26 +26,20 @@ export async function PUT(req, { params }) {
     const formData = await req.formData();
     const body = {};
 
-    for (let [key, value] of formData.entries()) {
-      if (
-        key !== "files" &&
-        key !== "specifications" &&
-        key !== "imagesState"
-      ) {
+    for (const [key, value] of formData.entries()) {
+      if (key !== "files" && key !== "imagesState" && key !== "specifications") {
         body[key] = value;
       }
     }
 
-    const rawSpecs = formData.get("specifications");
-    if (rawSpecs) {
-      try {
-        body.specifications = JSON.parse(rawSpecs);
-      } catch {
-        body.specifications = [];
-      }
+    try {
+      body.specifications = JSON.parse(formData.get("specifications") || "[]");
+    } catch {
+      body.specifications = [];
     }
 
     const existingProduct = await Product.findById(id);
+
     if (!existingProduct) {
       return NextResponse.json({
         success: false,
@@ -53,41 +47,41 @@ export async function PUT(req, { params }) {
       });
     }
 
+    // Generate slug
     if (body.name && body.name !== existingProduct.name) {
       let slug = slugify(body.name);
-      let existing = await Product.findOne({
-        slug,
-        _id: { $ne: id },
-      });
-
+      let exists = await Product.findOne({ slug, _id: { $ne: id }, });
       let count = 1;
-      while (existing) {
+
+      while (exists) {
         slug = `${slugify(body.name)}-${count}`;
-        existing = await Product.findOne({
-          slug,
-          _id: { $ne: id },
-        });
+        exists = await Product.findOne({ slug, _id: { $ne: id }, });
         count++;
       }
+
       body.slug = slug;
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, body, {
-      new: true,
-    });
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id, body, { new: true, }
+    );
 
-    const imagesStateRaw = formData.get("imagesState");
-    const imagesState = imagesStateRaw ? JSON.parse(imagesStateRaw) : [];
+    const imagesState = JSON.parse(formData.get("imagesState") || "[]");
+    const existingMedia = await ProductMedia.find({ productId: id, });
 
-    const existingMedia = await ProductMedia.find({ productId: id });
-
-    for (let media of existingMedia) {
-      const stillExists = imagesState.find(
-        (img) => img.url && img.url === media.url
+    // DELETE REMOVED MEDIA
+    for (const media of existingMedia) {
+      const exists = imagesState.find((img) =>
+        img.mediaId?.toString() === media._id.toString()
       );
 
-      if (!stillExists) {
-        const key = media.url.split(".r2.dev/")[1];
+      // replaced handled later
+      if (exists?.replaced) {
+        continue;
+      }
+
+      if (!exists) {
+        const key = media.url?.split(".r2.dev/")[1];
         if (key) {
           await deleteFromR2(key);
         }
@@ -97,12 +91,15 @@ export async function PUT(req, { params }) {
 
     const files = formData.getAll("files");
     let fileIndex = 0;
-    for (let img of imagesState) {
+
+    for (const img of imagesState) {
       if (!img.isOld) {
         const file = files[fileIndex++];
         if (!file) continue;
+
         const buffer = Buffer.from(await file.arrayBuffer());
         const fileName = `${Date.now()}-${file.name}`;
+
         const uploadRes = await uploadToR2({
           file: buffer,
           folder: `products/${id}`,
@@ -111,24 +108,43 @@ export async function PUT(req, { params }) {
         });
 
         const mediaType = file.type.startsWith("image/")
-          ? "image" : file.type.startsWith("video/") ? "video"
-            : file.type === "application/pdf" ? "pdf" : null;
+          ? "image" : file.type.startsWith("video/")
+            ? "video" : "pdf";
 
-        await ProductMedia.create({
-          productId: id,
-          type: mediaType,
-          url: uploadRes.url,
-          isPrimary: img.isPrimary,
-        });
+        // REPLACE EXISTING IMAGE
+        if (img.replaced && img.mediaId) {
+          const oldMedia = await ProductMedia.findById(img.mediaId);
+
+          if (oldMedia?.url) {
+            const key = oldMedia.url.split(".r2.dev/")[1];
+            if (key) {
+              await deleteFromR2(key);
+            }
+          }
+
+          await ProductMedia.findByIdAndUpdate(img.mediaId, {
+            url: uploadRes.url,
+            type: mediaType,
+            isPrimary: img.isPrimary,
+          });
+        } else {
+          await ProductMedia.create({
+            productId: id,
+            type: mediaType,
+            url: uploadRes.url,
+            isPrimary: img.isPrimary,
+          });
+        }
       }
     }
 
-    for (let img of imagesState) {
-      if (img.isOld && img.url) {
-        await ProductMedia.updateOne(
-          { productId: id, url: img.url },
-          { $set: { isPrimary: img.isPrimary } }
-        );
+    // UPDATE EXISTING MEDIA
+    for (const img of imagesState) {
+      if (img.isOld && img.mediaId) {
+
+        await ProductMedia.findByIdAndUpdate(img.mediaId, {
+          isPrimary: img.isPrimary,
+        });
       }
     }
 
@@ -136,6 +152,7 @@ export async function PUT(req, { params }) {
       success: true,
       data: updatedProduct,
     });
+
   } catch (err) {
     return NextResponse.json({
       success: false,
@@ -144,16 +161,57 @@ export async function PUT(req, { params }) {
   }
 }
 
-// ✅ DELETE
+// ✅ DELETE PRODUCT + MEDIA + R2 FILES
 export async function DELETE(req, { params }) {
   try {
     await connectDB();
     const { id } = await params;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return NextResponse.json({
+        success: false,
+        error: "Product not found",
+      });
+    }
+
+    // Get all product media
+    const media = await ProductMedia.find({ productId: id, });
+
+    // Delete images from R2
+    for (const item of media) {
+      try {
+        if (item.url) {
+          const key = item.url.split(".r2.dev/")[1];
+          if (key) {
+            await deleteFromR2(key);
+          }
+        }
+      } catch (err) {
+        console.error("R2 delete failed:", item.url
+        );
+      }
+    }
+
+    await ProductMedia.deleteMany({ productId: id, });
+
+    // Delete product
     await Product.findByIdAndDelete(id);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: "Product deleted successfully",
+    });
+
   } catch (err) {
-    return NextResponse.json({ success: false, error: err.message });
+    return NextResponse.json(
+      {
+        success: false,
+        error: err.message,
+      },
+      { status: 500, }
+    );
   }
 }
 
