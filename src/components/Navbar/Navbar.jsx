@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -17,6 +18,7 @@ export default function Navbar() {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const router = useRouter();
+  const [businessDetails, setBusinessDetails] = useState(null);
 
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
@@ -25,6 +27,25 @@ export default function Navbar() {
     window.location.reload();
     setProfileOpen(false)
   };
+
+  const fetchBusiness = async () => {
+    try {
+      const res = await axios.get(`/api/webpage/${user?._id}`);
+      console.log(res.data)
+      if (res.data) {
+        setBusinessDetails(res.data)
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to load data");
+    }
+  };
+
+  useEffect(() => {
+    if (user?._id) {
+      fetchBusiness()
+    }
+  }, [user]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -42,6 +63,10 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+
+
+  console.log(businessDetails)
 
   return (
     <nav className="w-full border-b border-b-gray-300 bg-white sticky top-0 z-50 h-20">
@@ -87,6 +112,11 @@ export default function Navbar() {
                     className="w-full px-4 py-2 text-left hover:bg-gray-100 text-black">
                     Dashboard
                   </button>
+
+                  {businessDetails?.slug &&
+                    <a href={`https://dir.inquirybazaar.com/${businessDetails?.slug}`} target="blank" className="block  w-full px-4 py-2 text-left hover:bg-gray-100 text-black">
+                      View Catalog
+                    </a>}
 
                   <button onClick={handleLogout} className="w-full px-4 py-2 text-left text-red-500 hover:bg-red-100 flex items-center gap-2">
                     <LogOut size={16} />

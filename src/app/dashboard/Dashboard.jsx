@@ -76,39 +76,36 @@ export default function Dashboard() {
     show: { opacity: 1, y: 0 },
   };
 
-
-
-const [showingPrevious, setShowingPrevious] = useState(false);
-
+  const [showingPrevious, setShowingPrevious] = useState(false);
   useEffect(() => {
-const fetchLeads = async () => {
-  try {
-    setLoading(true);
+    const fetchLeads = async () => {
+      try {
+        setLoading(true);
 
-    const todayRes = await axios.get(
-      `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=today`
-    );
+        const todayRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=today`
+        );
 
-    if (todayRes.data.success && todayRes.data.data?.length > 0) {
-      setLeadsData(todayRes.data.data);
-      setShowingPrevious(false);
-      return;
-    }
+        if (todayRes.data.success && todayRes.data.data?.length > 0) {
+          setLeadsData(todayRes.data.data);
+          setShowingPrevious(false);
+          return;
+        }
 
-    const previousRes = await axios.get(
-      `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=all`
-    );
+        const previousRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=all`
+        );
 
-    if (previousRes.data.success) {
-      setLeadsData(previousRes.data.data || []);
-      setShowingPrevious(true);
-    }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
+        if (previousRes.data.success) {
+          setLeadsData(previousRes.data.data || []);
+          setShowingPrevious(true);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
     if (user?._id) {
       fetchBusiness();
       fetchLeads();
@@ -120,7 +117,7 @@ const fetchLeads = async () => {
   return (
     <div className="w-full min-h-screen bg-slate-100 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="grid lg:grid-cols-4 gap-5">
+        <div className="relative grid lg:grid-cols-4 gap-5">
           <motion.div variants={card} initial="hidden" animate="show"
             className="bg-white rounded-3xl p-6 shadow-sm"
           >
@@ -257,31 +254,34 @@ const fetchLeads = async () => {
               </div>
 
             </div>
+            <button className="absolute bg-white/20 px-2 py-1 rounded-full text-sm font-medium flex items-center gap-1 bottom-2 right-2.5 duration-300 cursor-pointer hover:scale-105 transition-all">
+              Upgrade Now
+            </button>
           </motion.div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-         <motion.div
-  variants={card}
-  initial="hidden"
-  animate="show"
-  transition={{ delay: 0.4 }}
-  className="lg:col-span-2 bg-white rounded-3xl py-6 px-4 shadow-sm"
->
-  <div className="flex items-center gap-3 mb-4">
-    <MessageSquare className="text-indigo-600" />
-    <h2 className="font-bold text-xl">
-      Latest Inquiries
-    </h2>
-  </div>
+          <motion.div
+            variants={card}
+            initial="hidden"
+            animate="show"
+            transition={{ delay: 0.4 }}
+            className="lg:col-span-2 bg-white rounded-3xl py-6 px-4 shadow-sm"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <MessageSquare className="text-indigo-600" />
+              <h2 className="font-bold text-xl">
+                Latest Inquiries
+              </h2>
+            </div>
 
-  {showingPrevious && (
-    <div className="mb-4 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm">
-      No leads received today. Showing previous inquiries.
-    </div>
-  )}
+            {showingPrevious && (
+              <div className="mb-4 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm">
+                No leads received today. Showing previous inquiries.
+              </div>
+            )}
 
-  {loading ? (
+            {loading ? (
               // Loading Skeleton
               <div className="grid md:grid-cols-2 gap-2">
                 {[...Array(6)].map((_, i) => (
@@ -311,12 +311,12 @@ const fetchLeads = async () => {
                           {item.name}
                         </h3>
 
-                        <p className="text-slate-500">
+                        <p className="text-slate-500 line-clamp-2">
                           {item.product}
                         </p>
                       </div>
 
-                      <span className="text-sm text-slate-600">
+                      <span className="text-sm text-slate-600 text-nowrap">
                         {new Date(item.createdAt).toLocaleTimeString()}
                       </span>
                     </div>
@@ -377,18 +377,18 @@ const fetchLeads = async () => {
               </div>
 
               <InfoRow
-                icon={<BriefcaseBusiness size={18} />}
-                label="Business Field"
-                value={businessDetails?.businessField}
-              />
-
-              {/* <InfoRow
                 icon={<IndianRupee size={18} />}
                 label="Annual Turnover"
                 value={businessDetails?.annualTurnover}
               />
 
               <InfoRow
+                icon={<BriefcaseBusiness size={18} />}
+                label="Business Field"
+                value={businessDetails?.businessField}
+              />
+
+              {/* <InfoRow
                 icon={<Users size={18} />}
                 label="Employees"
                 value={businessDetails?.numberOfEmployees}
