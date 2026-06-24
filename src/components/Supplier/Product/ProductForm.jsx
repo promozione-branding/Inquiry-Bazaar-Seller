@@ -135,8 +135,13 @@ export default function ProductForm({ activeTab, form, setForm }) {
                         options={[
                             { label: "Piece", value: "Piece" },
                             { label: "Pair", value: "Pair" },
+                            { label: "Jar", value: "Jar" },
+                            { label: "Bottle", value: "Bottle" },
+                            { label: "Set", value: "Set" },
+                            { label: "Bag", value: "Bag" },
                             { label: "Inch", value: "Inch" },
                             { label: "Square ft.", value: "Square ft." },
+                            { label: "Square mt.", value: "Square mt." },
                             { label: "Kg", value: "Kg" },
                             { label: "Gram", value: "Gram" },
                             { label: "Meter", value: "Meter" },

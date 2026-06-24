@@ -34,6 +34,8 @@ export const employeNumber = [
     "Upto 10 People",
     "11 to 25 People",
     "26 to 30 People",
+    "30 to 50 People",
+    "50 to 100 People",
 ];
 
 export const mainCategory = [
