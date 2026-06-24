@@ -88,7 +88,7 @@ export async function POST(req) {
       },
     });
 
-    response.cookies.set("seller_inquiry_bazaar_token", token, {
+    response.cookies.set("inquiry_bazaar_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
