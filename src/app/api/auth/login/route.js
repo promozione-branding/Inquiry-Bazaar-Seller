@@ -88,14 +88,14 @@ export async function POST(req) {
       },
     });
 
-    response.cookies.set("inquiry_bazaar_token", token, {
+    response.cookies.set("seller_inquiry_bazaar_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      ...(process.env.NODE_ENV === "production" && {
-        domain: ".inquirybazaar.com",
-      }),
+      // ...(process.env.NODE_ENV === "production" && {
+      //   domain: ".inquirybazaar.com",
+      // }),
       maxAge: 60 * 60 * 24 * 7,
     });
 
