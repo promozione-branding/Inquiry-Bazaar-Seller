@@ -37,12 +37,7 @@ export async function GET() {
         { status: 401 }
       );
 
-      response.cookies.set(process.env.COOKIE_NAME, "",
-        {
-          path: "/",
-          maxAge: 0,
-        }
-      );
+      response.cookies.delete(process.env.COOKIE_NAME);
 
       return response;
     }
