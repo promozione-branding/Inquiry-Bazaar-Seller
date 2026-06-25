@@ -37,7 +37,16 @@ export async function GET() {
         { status: 401 }
       );
 
-      response.cookies.delete(process.env.COOKIE_NAME);
+      response.cookies.set(process.env.COOKIE_NAME, "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        ...(process.env.NODE_ENV === "production" && {
+          domain: ".inquirybazaar.com",
+        }),
+        expires: new Date(0),
+      });
 
       return response;
     }
