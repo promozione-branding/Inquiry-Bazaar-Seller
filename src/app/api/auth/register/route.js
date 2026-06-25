@@ -52,18 +52,16 @@ export async function POST(req) {
     }, { status: 201 });
 
     // ✅ COOKIE
-    response.cookies.set(
-      process.env.COOKIE_NAME, token,
-      {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        ...(process.env.NODE_ENV === "production" && {
-          domain: ".inquirybazaar.com",
-        }),
-        maxAge: 60 * 60 * 24 * 7,
-      }
+    response.cookies.set(process.env.COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      ...(process.env.NODE_ENV === "production" && {
+        domain: ".inquirybazaar.com",
+      }),
+      maxAge: 60 * 60 * 24 * 7,
+    }
     );
 
     return response;

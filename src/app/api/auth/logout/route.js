@@ -9,7 +9,7 @@ export async function POST() {
     await connectDB();
 
     const cookieStore = await cookies();
-    const token = cookieStore.get("seller_inquiry_bazaar_token")?.value;
+    const token = cookieStore.get(process.env.COOKIE_NAME)?.value;
 
     // 🔐 If token exists → delete session too
     if (token) {
@@ -30,7 +30,7 @@ export async function POST() {
       message: "Logout successful",
     });
 
-    response.cookies.set("seller_inquiry_bazaar_token", "", {
+    response.cookies.set(process.env.COOKIE_NAME, "", {
       path: "/",
       maxAge: 0,
     });

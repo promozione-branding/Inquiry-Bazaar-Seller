@@ -11,7 +11,7 @@ export async function POST() {
     const cookieStore = await cookies();
 
     const token =
-      cookieStore.get("seller_inquiry_bazaar_token")?.value;
+      cookieStore.get(process.env.COOKIE_NAME)?.value;
 
     if (!token) {
       return NextResponse.json(

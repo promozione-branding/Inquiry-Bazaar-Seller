@@ -20,7 +20,7 @@ export async function middleware(req) {
     return NextResponse.next();
   }
 
-  const token = req.cookies.get("seller_inquiry_bazaar_token")?.value;
+  const token = req.cookies.get(process.env.COOKIE_NAME)?.value;
 
   // LOGIN / REGISTER PAGES
   if (AUTH_ROUTES.includes(pathname)) {

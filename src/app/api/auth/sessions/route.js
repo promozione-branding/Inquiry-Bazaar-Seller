@@ -9,7 +9,7 @@ export async function GET() {
     await connectDB();
 
     const cookieStore = await cookies();
-    const token = cookieStore.get("seller_inquiry_bazaar_token")?.value;
+    const token = cookieStore.get(process.env.COOKIE_NAME)?.value;
 
     if (!token) {
       return NextResponse.json(
