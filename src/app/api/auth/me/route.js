@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("inquiry_bazaar_token")?.value;
+    const token = cookieStore.get("seller_inquiry_bazaar_token")?.value;
 
     // 🚀 EXIT FAST
     if (!token) {
@@ -37,7 +37,7 @@ export async function GET() {
         { status: 401 }
       );
 
-      response.cookies.set("inquiry_bazaar_token", "",
+      response.cookies.set("seller_inquiry_bazaar_token", "",
         {
           path: "/",
           maxAge: 0,

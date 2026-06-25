@@ -59,6 +59,9 @@ export async function POST(req) {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
+        ...(process.env.NODE_ENV === "production" && {
+          domain: ".inquirybazaar.com",
+        }),
         maxAge: 60 * 60 * 24 * 7,
       }
     );

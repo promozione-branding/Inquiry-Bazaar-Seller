@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-const AUTH_ROUTES = ["/","/forgot-password", "/login", "/register"];
+const AUTH_ROUTES = ["/", "/forgot-password", "/login", "/register"];
 
 async function verifyToken(token) {
   try {
@@ -20,7 +20,7 @@ export async function middleware(req) {
     return NextResponse.next();
   }
 
-  const token = req.cookies.get("inquiry_bazaar_token")?.value;
+  const token = req.cookies.get("seller_inquiry_bazaar_token")?.value;
 
   // LOGIN / REGISTER PAGES
   if (AUTH_ROUTES.includes(pathname)) {

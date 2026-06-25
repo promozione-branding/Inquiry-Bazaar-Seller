@@ -36,9 +36,7 @@ export async function POST(req) {
       );
     }
 
-    // =========================
     // DEVICE INFO
-    // =========================
     const userAgent = req.headers.get("user-agent") || "";
     const parser = new UAParser(userAgent);
 
@@ -49,9 +47,7 @@ export async function POST(req) {
     const deviceName = `${browser} on ${os}`;
     const ip = req.headers.get("x-forwarded-for") || "unknown";
 
-    // =========================
     // SESSION CREATE
-    // =========================
     const session = await Session.create({
       userId: user._id,
       browser,
@@ -62,9 +58,7 @@ export async function POST(req) {
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
-    // =========================
     // JWT
-    // =========================
     const token = jwt.sign(
       {
         id: user._id,
@@ -75,9 +69,7 @@ export async function POST(req) {
       { expiresIn: "7d" }
     );
 
-    // =========================
     // RESPONSE + COOKIE
-    // =========================
     const response = NextResponse.json({
       success: true,
       user: {
@@ -88,14 +80,14 @@ export async function POST(req) {
       },
     });
 
-    response.cookies.set("inquiry_bazaar_token", token, {
+    response.cookies.set("seller_inquiry_bazaar_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      // ...(process.env.NODE_ENV === "production" && {
-      //   domain: ".inquirybazaar.com",
-      // }),
+      ...(process.env.NODE_ENV === "production" && {
+        domain: ".inquirybazaar.com",
+      }),
       maxAge: 60 * 60 * 24 * 7,
     });
 
