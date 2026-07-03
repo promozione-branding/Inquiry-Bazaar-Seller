@@ -52,31 +52,64 @@ body {
 }
 
 .icon-btn-blue {
-  @apply w-10 h-10 flex items-center justify-center rounded-md 
-  bg-[#074977]/10 text-[#074977] 
-  hover:bg-[#074977] hover:text-white transition;
+  @apply w-10 h-10 flex items-center justify-center rounded-md bg-[#074977]/10 text-[#074977] hover:bg-[#074977] hover:text-white transition;
 }
 
 .icon-btn-red {
-  @apply w-10 h-10 flex items-center justify-center rounded-md 
-  bg-[#D01132]/10 text-[#D01132] 
-  hover:bg-[#D01132] hover:text-white transition;
+  @apply w-10 h-10 flex items-center justify-center rounded-md bg-[#D01132]/10 text-[#D01132] hover:bg-[#D01132] hover:text-white transition;
 }
 
 .icon-btn-danger {
-  @apply w-10 h-10 flex items-center justify-center rounded-md 
-  bg-red-100 text-red-600 
-  hover:bg-red-500 hover:text-white transition;
+  @apply w-10 h-10 flex items-center justify-center rounded-md bg-red-100 text-red-600 hover:bg-red-500 hover:text-white transition;
 }
 
 .mini-btn-blue {
-  @apply w-8 h-8 flex items-center justify-center rounded 
-  bg-[#074977]/10 text-[#074977] 
-  hover:bg-[#074977] hover:text-white transition;
+  @apply w-8 h-8 flex items-center justify-center rounded bg-[#074977]/10 text-[#074977] hover:bg-[#074977] hover:text-white transition;
 }
 
 .mini-btn-danger {
-  @apply w-8 h-8 flex items-center justify-center rounded 
-  bg-red-100 text-red-600 
-  hover:bg-red-500 hover:text-white transition;
+  @apply w-8 h-8 flex items-center justify-center rounded bg-red-100 text-red-600 hover:bg-red-500 hover:text-white transition;
+}
+
+.jodit-wysiwyg ul {
+  list-style: disc;
+  padding-left: 20px;
+}
+
+.jodit-wysiwyg ol {
+  list-style: decimal;
+  padding-left: 20px;
+}
+
+.jodit-wysiwyg ul ul {
+  list-style: circle;
+}
+
+.jodit-wysiwyg ul ul ul {
+  list-style: square;
+}
+
+/* Global styling for Jodit content */
+.jodit-content {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.jodit-content ul {
+  list-style-type: disc;
+  /* or circle, square */
+  margin-left: 20px;
+  padding-left: 20px;
+}
+
+.jodit-content ol {
+  list-style-type: decimal;
+  margin-left: 20px;
+  padding-left: 20px;
+}
+
+.jodit-content li {
+  margin: 5px 0;
 }
