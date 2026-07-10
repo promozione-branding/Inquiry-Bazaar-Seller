@@ -150,6 +150,8 @@ export default function ProductForm({ activeTab, form, setForm }) {
                             { label: "Pack", value: "Pack" },
                             { label: "Ton", value: "Ton" },
                             { label: "Box", value: "Box" },
+                            { label: "Watt", value: "Watt" },
+                            { label: "Volt", value: "Volt" },
                         ]}
                     />
 
