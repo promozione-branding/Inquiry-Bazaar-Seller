@@ -135,6 +135,7 @@ export default function ProductForm({ activeTab, form, setForm }) {
                         options={[
                             { label: "Piece", value: "Piece" },
                             { label: "Pair", value: "Pair" },
+                            { label: "Strip", value: "Strip" },
                             { label: "Jar", value: "Jar" },
                             { label: "Bottle", value: "Bottle" },
                             { label: "Set", value: "Set" },
