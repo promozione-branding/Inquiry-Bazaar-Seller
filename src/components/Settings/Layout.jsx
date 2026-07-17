@@ -54,7 +54,7 @@ export default function Layout({ layout, setLayout, user }) {
 
             // PROFILE SETTINGS
             case "profile-settings":
-                router.push("/supplier/profile");
+                router.push("/profile");
                 return null;
 
             default: return <div>No Layout Found</div>;

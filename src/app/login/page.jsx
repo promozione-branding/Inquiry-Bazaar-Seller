@@ -36,17 +36,12 @@ export default function LoginPage() {
     const onSubmit = async (e) => {
         e.preventDefault();
 
-        if (otpMode) {
-            return toast.success("Only Login with Password Working");
-        }
-
         try {
             const res = await axios.post("/api/auth/login", form);
             const data = res.data;
 
             if (data.success) {
                 toast.success("Login Successful");
-
                 const res1 = await fetch("/api/auth/me");
                 const data1 = await res1.json();
 
@@ -66,20 +61,25 @@ export default function LoginPage() {
     const handleSendOtp = async (e) => {
         e.preventDefault();
 
+        if (!/^[6-9]\d{9}$/.test(form.phoneNumber)) {
+            toast.error("Enter a valid mobile number");
+            return;
+        }
+
         try {
             setOtpLoading(true);
             const phone = `+91${form.phoneNumber}`;
             const res = await sendFirebaseOtp(phone, "recaptcha-container");
 
-            if (res.success) {
-                toast.success("OTP Sent Successfully");
-                setOtpSent(true);
-            } else {
-                toast.error("Failed To Send OTP");
+            if (!res.success) {
+                toast.error(res.message || "Failed to send OTP");
+                return;
             }
-        } catch (error) {
-            console.log(error);
-            toast.error("Something Went Wrong");
+
+            toast.success("OTP sent successfully");
+            setOtpSent(true);
+        } catch (err) {
+            toast.error("Unable to send OTP");
         } finally {
             setOtpLoading(false);
         }
@@ -89,31 +89,49 @@ export default function LoginPage() {
     const handleVerifyOtp = async (e) => {
         e.preventDefault();
 
+        if (form.otp.length !== 6) {
+            toast.error("Enter a valid OTP");
+            return;
+        }
+
         try {
             setOtpLoading(true);
+            const verify = await verifyFirebaseOtp(form.otp);
 
-            const res = await verifyFirebaseOtp(form.otp);
-            if (res.success) {
-                toast.success("Login Successful");
-                const firebaseUser = res.user;
-                console.log(firebaseUser);
-
-                const response = await axios.post("/api/auth/otp-login", {
-                    phoneNumber: form.phoneNumber,
-                });
-
-                if (response.data.success) {
-                    dispatch(setUser(response.data.user));
-                    router.push(`/${response.data.user.role}/dashboard`);
-                }
-
-            } else {
-                toast.error("Invalid OTP");
+            if (!verify.success) {
+                toast.error(verify.message || "Invalid OTP");
+                return;
             }
 
+            const phone = `${form.phoneNumber}`;
+            await axios.post("/api/auth/login-with-otp",
+                { phone }, { withCredentials: true }
+            );
+
+            toast.success("Login Successful");
+            const res = await fetch("/api/auth/me");
+            const data = await res.json();
+
+            if (data.user) {
+                dispatch(setUser(data.user));
+                router.push("/profile");
+            }
         } catch (error) {
-            console.log(error);
-            toast.error(error?.response?.data?.message || "OTP Verification Failed");
+            if (axios.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+
+                if (status === 404) {
+                    toast.error(data.message || "User not found");
+
+                    setTimeout(() => {
+                        router.push(`/register`);
+                    }, 1500);
+                    return;
+                }
+                toast.error(data.message || "Login failed");
+            } else {
+                toast.error("Network error");
+            }
         } finally {
             setOtpLoading(false);
         }
@@ -241,7 +259,10 @@ export default function LoginPage() {
                                 />
 
                                 <input
-                                    type="text"
+                                    type="tel"
+                                    value={form?.phoneNumber}
+                                    onChange={handleChange}
+                                    maxLength={10}
                                     name="phoneNumber"
                                     placeholder="Enter Phone Number"
                                     className="w-full border border-gray-300 focus:border-[#f45a06] focus:ring-2 focus:ring-[#f45a06]/20 outline-none pl-12 p-3 rounded-xl transition-all"
@@ -257,6 +278,8 @@ export default function LoginPage() {
 
                                 <input
                                     name="otp"
+                                    disabled={!otpSent}
+                                    value={form?.otp}
                                     onChange={handleChange}
                                     type="number"
                                     placeholder="Enter OTP"

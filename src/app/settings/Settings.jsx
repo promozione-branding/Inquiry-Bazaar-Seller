@@ -114,7 +114,7 @@ export default function Settings() {
                 </div>
               </div>
 
-              <button onClick={() => { item.id === "profile-settings" ? router.push("/supplier/profile") : setLayout(item.id) }}
+              <button onClick={() => { item.id === "profile-settings" ? router.push("/profile") : setLayout(item.id) }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-medium transition-all duration-200 ${buttonColors[item.color]}`} >
                 {item.button}
                 <LuChevronRight size={16} />

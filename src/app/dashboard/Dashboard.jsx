@@ -119,7 +119,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="relative grid lg:grid-cols-4 gap-5">
           <motion.div variants={card} initial="hidden" animate="show"
-            className="bg-white rounded-3xl p-6 shadow-sm"
+            className="bg-white rounded-3xl py-5 px-4 shadow-sm"
           >
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 rounded-2xl bg-indigo-600 flex items-center justify-center">
@@ -137,20 +137,20 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="mt-2 space-y-2">
-              <div className="flex gap-3 text-slate-600">
+            <div className="mt-3 space-y-2">
+              <a href="mailto:care@inquirybazaar.com" className="flex items-center gap-2 text-slate-600">
                 <Mail size={18} />
-                employee@inquirybazaar.com
-              </div>
+                care@inquirybazaar.com
+              </a>
 
               <div className="flex justify-between items-center">
-                <div className="flex gap-3 text-slate-600">
-                  <Phone size={18} />
-                  9999999999
-                </div>
-                <button className="flex gap-1 items-center bg-blue-500 text-xs hover:bg-blue-600 p-2 rounded-md text-white">
+                <a href="tel:+917303486777" className="flex items-center gap-1.5 text-slate-600">
+                  <Phone size={16} />
+                  +917303486777
+                </a>
+                <a href="tel:+917303486777" className="flex gap-1 items-center bg-blue-500 text-xs hover:bg-blue-600 p-2 rounded-md text-white">
                   <PhoneCall size={14} /> Contact Now
-                </button>
+                </a>
               </div>
             </div>
           </motion.div>
@@ -254,9 +254,10 @@ export default function Dashboard() {
               </div>
 
             </div>
-            <button className="absolute bg-white/20 px-2 py-1 rounded-full text-sm font-medium flex items-center gap-1 bottom-2 right-2.5 duration-300 cursor-pointer hover:scale-105 transition-all">
+
+            <a href="https://corporate.inquirybazaar.com/pricing" target="blank" className="absolute bg-white/20 px-2 py-1 rounded-full text-[13px] font-medium flex items-center gap-1 bottom-2 right-2.5 duration-300 cursor-pointer hover:scale-105 transition-all">
               Upgrade Now
-            </button>
+            </a>
           </motion.div>
         </div>
 
