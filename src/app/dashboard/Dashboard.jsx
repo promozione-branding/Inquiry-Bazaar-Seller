@@ -28,18 +28,25 @@ import {
   PhoneCall,
   Twitter,
   Linkedin,
+  CreditCard,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
+import Modal from "@/components/Modal/Modal";
+import SelectInput from "@/components/Inputs/SelectInput";
+import Input from "@/components/Inputs/FormInput";
 
 export default function Dashboard() {
   const { user } = useSelector((state) => state.auth);
+  const [modelOpen, setModelOper] = useState(false)
+  const [plan, setPlan] = useState("")
   const [businessDetails, setBusinessDetails] = useState(null)
   const [leadsData, setLeadsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loading1, setLoading1] = useState(false);
   const fetchBusiness = async () => {
     try {
       const res = await axios.get("/api/profile/business", {
@@ -112,7 +119,45 @@ export default function Dashboard() {
     }
   }, [user]);
 
-  // console.log(businessDetails)
+  const handleSubmit = async () => {
+    if (plan === "") return toast.error("Select your plan first")
+
+    const data = {
+      supplierToken: "7303486777",
+      platform: "Seller Dashboard",
+      platformEmail: "lead.inquirybazaar@gmail.com",
+      name: user?.name || "NA",
+      email: user?.email || "NA",
+      company: businessDetails?.companyName || "NA",
+      phone: user?.phone || "NA",
+      product: `${plan} plan` || "NA",
+      place: businessDetails?.address || "NA",
+      message: "Inquiry for membership plan",
+    };
+
+    // if (!/^\d{10}$/.test(user?.phone)) {
+    //   return toast.error("Enter a valid 10-digit phone number");
+    // }
+
+    try {
+      setLoading1(true);
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/add`, data,
+        { validateStatus: (status) => status >= 200 && status < 500 }
+      );
+      if (res.status >= 200 && res.status < 300) {
+        toast.success("Message send successfully");
+        setTimeout(() => {
+          setModelOper(false);
+        }, 1000);
+        setPlan("")
+      }
+    } catch (err) {
+      console.log("ERROR:", err?.response || err.message);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading1(false);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-slate-100 p-4 md:p-6">
@@ -228,13 +273,13 @@ export default function Dashboard() {
                     "
                   >
                     <BadgeCheck size={12} />
-                    Active
+                    N/A
                   </span>
 
                 </div>
 
                 <h2 className="text-3xl font-bold mt-2">
-                  Elite Plan
+                  No Active Plan
                 </h2>
               </div>
 
@@ -245,19 +290,19 @@ export default function Dashboard() {
 
               <div className="flex gap-2">
                 <Calendar size={18} />
-                Start • 01 Jan 2026
+                N/A
               </div>
 
               <div className="flex gap-2">
                 <Calendar size={18} />
-                End • 31 Dec 2026
+                N/A
               </div>
 
             </div>
 
-            <a href="https://corporate.inquirybazaar.com/pricing" target="blank" className="absolute bg-white/20 px-2 py-1 rounded-full text-[13px] font-medium flex items-center gap-1 bottom-2 right-2.5 duration-300 cursor-pointer hover:scale-105 transition-all">
+            <button onClick={() => setModelOper(true)} className="absolute bg-white/20 px-2 py-1 rounded-full text-[13px] font-medium flex items-center gap-1 bottom-2 right-2.5 duration-300 cursor-pointer hover:scale-105 transition-all">
               Upgrade Now
-            </a>
+            </button>
           </motion.div>
         </div>
 
@@ -457,6 +502,67 @@ export default function Dashboard() {
           </motion.div>
         </div>
       </div>
+
+      <Modal open={modelOpen} onClose={() => setModelOper(false)}>
+        <Modal.Header title="Contact Us" />
+        <Modal.Body>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              <SelectInput
+                label="Membership Plan"
+                Icon={CreditCard}
+                name="membershipPlan"
+                value={plan}
+                onChange={(e) => setPlan(e.target.value)}
+                options={["Elite", "Pro", "Growth", "Starter"].map((c) => ({
+                  label: c,
+                  value: c,
+                }))}
+              />
+              <Input
+                label="Your Name"
+                type="text"
+                Icon={User}
+                name="name"
+                disabled
+                value={user?.name}
+              // onChange={handleChange}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                label="Your Phone"
+                type="tel"
+                Icon={Phone}
+                name="phone"
+                disabled
+                value={user?.phone}
+              // onChange={handleChange}
+              />
+              <Input
+                label="Your Email"
+                type="text"
+                Icon={Mail}
+                name="email"
+                disabled
+                value={user?.email}
+              // onChange={handleChange}
+              />
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className='flex justify-end gap-2'>
+            <button disabled={loading1} onClick={handleSubmit} className="px-4 py-2 rounded-md text-white bg-[#f45a06] hover:bg-[#e45407]">
+              {loading1 ? "Sending..." : "Send"}
+            </button>
+            <button onClick={() => setModelOper(false)} className="border border-gray-300 px-4 py-2 rounded-md text-black bg-gray-100 hover:bg-gray-200">
+              Close
+            </button>
+          </div>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

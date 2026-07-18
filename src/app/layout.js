@@ -6,8 +6,8 @@ import ReduxProvider from "@/redux/ReduxProvider";
 import Stickyfooter from "@/components/Footer/StickyFooter";
 
 export const metadata = {
-  title: "Seller - Inquiry Bazaar",
-  description: "Inquiry Bazaar B2B marketplace",
+  title: "Seller Registration | Sell Online & Get Verified B2B Leads | Inquiry Bazaar",
+  description: "Create your seller account on Inquiry Bazaar to list products, increase online visibility and receive high-intent B2B inquiries from verified buyers. Grow your business with India's hybrid B2B marketplace.",
 };
 
 export default function RootLayout({ children }) {
