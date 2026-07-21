@@ -116,6 +116,7 @@ export async function POST(req) {
 export async function GET(req) {
   try {
     await connectDB();
+
     const { searchParams } = new URL(req.url);
     const supplierId = searchParams.get("supplierId");
 
@@ -126,14 +127,51 @@ export async function GET(req) {
     }
 
     const products = await Product.aggregate([
-      { $match: matchStage },
+      {
+        $match: matchStage,
+      },
 
+      // Product Images
       {
         $lookup: {
           from: "productmedias",
           localField: "_id",
           foreignField: "productId",
           as: "media",
+        },
+      },
+
+      // Sub Category
+      {
+        $lookup: {
+          from: "categories", // <-- your collection name
+          localField: "subCategoryId",
+          foreignField: "_id",
+          as: "subCategory",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$subCategory",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      // Category (Optional)
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
         },
       },
 
@@ -145,7 +183,9 @@ export async function GET(req) {
                 $filter: {
                   input: "$media",
                   as: "m",
-                  cond: { $eq: ["$$m.isPrimary", true] },
+                  cond: {
+                    $eq: ["$$m.isPrimary", true],
+                  },
                 },
               },
               0,
@@ -154,7 +194,11 @@ export async function GET(req) {
         },
       },
 
-      { $sort: { createdAt: -1 } },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
     ]);
 
     return NextResponse.json({

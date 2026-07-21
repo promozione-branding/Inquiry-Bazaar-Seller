@@ -538,7 +538,7 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
         </div>
       }
 
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-5 py-4 border-t border-gray-200 bg-white">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 border-t border-gray-200 bg-white">
         <p className="text-sm text-gray-500">
           Showing{" "}
           <span className="font-medium">

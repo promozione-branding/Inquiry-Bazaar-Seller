@@ -6,11 +6,14 @@ import dynamic from "next/dynamic";
 import SelectInput from '@/components/Inputs/SelectInput';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import Link from 'next/link';
 
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function WebpageForm({ user, saving, section, form, setForm, handleChange, handleSave }) {
     const [products, setProducts] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState("");
+    const [selectedPopularProduct, setSelectedPopularProduct] = useState("");
     const hexToRgba = (hex) => {
         let r = 0, g = 0, b = 0;
 
@@ -41,33 +44,30 @@ export default function WebpageForm({ user, saving, section, form, setForm, hand
         }
     }, [user]);
 
-    const handleProductSelect = (section, values) => {
-        const selected = Array.isArray(values) ? values : [values];
+    const handleProductSelect = (section, value) => {
+        if (!value) return;
 
         setForm((prev) => {
             const existing = prev?.[section]?.products || [];
 
-            let updated = [...existing];
+            if (existing.includes(value)) return prev;
 
-            selected.forEach((id) => {
-                if (!updated.includes(id)) {
-                    updated.push(id);
-                }
-            });
-
-            if (updated.length > 6) {
+            if (existing.length >= 6) {
                 toast.error("Maximum 6 products allowed");
-                updated = updated.slice(0, 6);
+                return prev;
             }
 
             return {
                 ...prev,
                 [section]: {
                     ...prev[section],
-                    products: updated,
+                    products: [...existing, value],
                 },
             };
         });
+
+        // Clear select
+        setSelectedProduct("");
     };
 
     const removeProduct = (section, id) => {
@@ -148,30 +148,39 @@ export default function WebpageForm({ user, saving, section, form, setForm, hand
                         <SelectInput
                             label="Select Featured Products"
                             Icon={Heading1}
-                            multiple
-                            value=""
+                            value={selectedProduct}
                             onChange={(e) => {
-                                const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
-                                handleProductSelect("featuredProducts", selected);
+                                setSelectedProduct(e.target.value);
+                                handleProductSelect("featuredProducts", e.target.value);
                             }}
-                            options={products.map((p) => ({
-                                label: p.name,
-                                value: p._id,
-                            }))}
+                            options={[
+                                // { label: "Select Product", value: "" },
+                                ...products
+                                    .filter(
+                                        (p) =>
+                                            !form.featuredProducts?.products?.includes(p._id)
+                                    )
+                                    .map((p) => ({
+                                        label: p.name,
+                                        value: p._id,
+                                    })),
+                            ]}
                         />
 
-                        <div className="md:col-span-2 mt-3 flex flex-wrap gap-2">
+                        <div className="flex flex-col gap-1 h-16 overflow-auto border border-gray-300 p-1 rounded-md">
                             {form.featuredProducts?.products?.map((id) => {
                                 const product = products.find((p) => p._id === id);
                                 return (
                                     <div key={id}
-                                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-50 border border-blue-300"
+                                        className="flex items-center justify-between text-sm px-2 py-2 rounded-lg bg-blue-50 border border-blue-300"
                                     >
-                                        <Package size={14} />
+                                        <div className='flex items-center gap-2'>
+                                            <Package size={14} />
 
-                                        <span>
-                                            {product?.name}
-                                        </span>
+                                            <span className='line-clamp-1'>
+                                                {product?.name}
+                                            </span>
+                                        </div>
 
                                         <button type="button" onClick={() => removeProduct("featuredProducts", id)}
                                             className="text-red-500 hover:text-red-700"
@@ -199,50 +208,46 @@ export default function WebpageForm({ user, saving, section, form, setForm, hand
                             onChange={(e) => handleChange("popularProducts", "subHeading", e.target.value)}
                         />
 
-                        <div>
-                            <label className="label">
-                                Select Popular Products
-                            </label>
+                        <SelectInput
+                            label="Select Popular Products"
+                            Icon={Heading1}
+                            value={selectedPopularProduct}
+                            onChange={(e) => {
+                                const value = e.target.value;
 
-                            <div className="relative">
-                                <Heading1
-                                    size={18}
-                                    className="icon"
-                                />
+                                setSelectedPopularProduct(value);
+                                handleProductSelect("popularProducts", value);
 
-                                <select
-                                    multiple
-                                    className="input pl-8! p-2.5! h-[100px]"
-                                    value={[]}
-                                    onChange={(e) => {
-                                        const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
-                                        handleProductSelect("popularProducts", selected);
-                                    }}
-                                >
-                                    {products.map((p) => (
-                                        <option
-                                            key={p._id}
-                                            value={p._id}
-                                        >
-                                            {p.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
+                                // Clear select
+                                setSelectedPopularProduct("");
+                            }}
+                            options={[
+                                ...products
+                                    .filter(
+                                        (p) =>
+                                            !form.popularProducts?.products?.includes(p._id)
+                                    )
+                                    .map((p) => ({
+                                        label: p.name,
+                                        value: p._id,
+                                    })),
+                            ]}
+                        />
 
-                        <div className="md:col-span-2 mt-3 flex flex-wrap gap-2">
+                        <div className="flex flex-col gap-1 h-16 overflow-auto border border-gray-300 p-1 rounded-md">
                             {form.popularProducts?.products?.map((id) => {
                                 const product = products.find((p) => p._id === id);
                                 return (
                                     <div key={id}
-                                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-300"
+                                        className="flex items-center justify-between text-sm px-2 py-2 rounded-lg bg-green-50 border border-green-300"
                                     >
-                                        <Package size={14} />
+                                        <div className='flex items-center gap-2'>
+                                            <Package size={14} />
 
-                                        <span>
-                                            {product?.name}
-                                        </span>
+                                            <span className='line-clamp-1'>
+                                                {product?.name}
+                                            </span>
+                                        </div>
 
                                         <button type="button" onClick={() => removeProduct("popularProducts", id)}
                                             className="text-red-500 hover:text-red-700"
@@ -346,9 +351,9 @@ export default function WebpageForm({ user, saving, section, form, setForm, hand
 
                 <div className="flex justify-between items-center gap-3 mt-6">
                     <div className="items-center">
-                        <span className='text-blue-600 hover:underline cursor-pointer'>
+                        <Link href={"/help"} className='text-blue-600 hover:underline cursor-pointer'>
                             Need help?
-                        </span>
+                        </Link>
                     </div>
                     <div className="flex gap-3">
                         <button className="px-5 py-2 rounded-lg bg-[#D01132] text-white cursor-pointer">
@@ -368,22 +373,22 @@ export default function WebpageForm({ user, saving, section, form, setForm, hand
 function FAQSection({ form, setForm }) {
 
     const handleFAQChange = (index, field, value) => {
-        const updated = [...form.faqSection.faqs];
+        const updated = [...form?.faqSection?.faqs];
         updated[index][field] = value;
 
         setForm((prev) => ({
             ...prev,
             faqSection: {
-                ...prev.faqSection,
+                ...prev?.faqSection,
                 faqs: updated,
             },
         }));
     };
 
     const addFAQ = () => {
-        const last = form.faqSection.faqs.at(-1);
+        const last = form?.faqSection?.faqs?.at(-1);
 
-        if (last && (!last.question || !last.answer)) {
+        if (last && (!last?.question || !last?.answer)) {
             toast.error("Please fill current FAQ first");
             return;
         }
@@ -391,9 +396,9 @@ function FAQSection({ form, setForm }) {
         setForm((prev) => ({
             ...prev,
             faqSection: {
-                ...prev.faqSection,
+                ...prev?.faqSection,
                 faqs: [
-                    ...prev.faqSection.faqs,
+                    ...prev?.faqSection?.faqs,
                     { question: "", answer: "" },
                 ],
             },
@@ -401,12 +406,12 @@ function FAQSection({ form, setForm }) {
     };
 
     const removeFAQ = (index) => {
-        const updated = form.faqSection.faqs.filter((_, i) => i !== index);
+        const updated = form?.faqSection?.faqs.filter((_, i) => i !== index);
 
         setForm((prev) => ({
             ...prev,
             faqSection: {
-                ...prev.faqSection,
+                ...prev?.faqSection,
                 faqs: updated,
             },
         }));
@@ -429,7 +434,7 @@ function FAQSection({ form, setForm }) {
             </div>
 
             {/* Empty State */}
-            {form.faqSection.faqs.length === 0 && (
+            {form?.faqSection?.faqs?.length === 0 && (
                 <div className="text-sm text-gray-400 mb-3">
                     No FAQs added
                 </div>
@@ -437,16 +442,14 @@ function FAQSection({ form, setForm }) {
 
             {/* FAQ List */}
             <div className="space-y-4">
-                {form.faqSection.faqs.map((faq, index) => (
+                {form?.faqSection?.faqs.map((faq, index) => (
                     <div key={index} className="grid md:grid-cols-2 gap-5">
 
                         {/* Question */}
                         <Input
                             label="Question"
-                            value={faq.question}
-                            onChange={(e) =>
-                                handleFAQChange(index, "question", e.target.value)
-                            }
+                            value={faq?.question}
+                            onChange={(e) => handleFAQChange(index, "question", e.target.value)}
                         />
 
                         {/* Answer + Remove */}
@@ -454,10 +457,8 @@ function FAQSection({ form, setForm }) {
                             <div className="flex-1">
                                 <Input
                                     label="Answer"
-                                    value={faq.answer}
-                                    onChange={(e) =>
-                                        handleFAQChange(index, "answer", e.target.value)
-                                    }
+                                    value={faq?.answer}
+                                    onChange={(e) => handleFAQChange(index, "answer", e.target.value)}
                                 />
                             </div>
 

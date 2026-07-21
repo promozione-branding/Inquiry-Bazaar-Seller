@@ -160,9 +160,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-slate-100 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="relative grid lg:grid-cols-4 gap-5">
+    <div className="w-full min-h-screen bg-slate-100 p-2 xl:p-6">
+      <div className="max-w-7xl mx-auto md:space-y-6 space-y-3">
+        <div className="relative grid md:grid-cols-2 xl:grid-cols-4 md:gap-5 gap-3">
           <motion.div variants={card} initial="hidden" animate="show"
             className="bg-white rounded-3xl py-5 px-4 shadow-sm"
           >
@@ -306,7 +306,7 @@ export default function Dashboard() {
           </motion.div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 xl:gap-6 gap-3">
           <motion.div
             variants={card}
             initial="hidden"

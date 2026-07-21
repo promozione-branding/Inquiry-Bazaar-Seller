@@ -20,7 +20,7 @@ export default function Leads() {
 
     useEffect(() => {
         const fetchTrackLeads = async () => {
-            console.log(1)
+            // console.log(1)
             try {
                 setLoading(true);
 
@@ -109,7 +109,7 @@ export default function Leads() {
                             </div>
                             <div className="md:hidden flex items-center bg-gray-100 p-1 rounded-xl w-fit shadow-sm">
                                 <button onClick={() => setSwitchButton(false)}
-                                    className={`px-5 py-2 rounded-lg text-sm font-medium text-nowrap transition-all duration-300 ${!switchButton
+                                    className={`px-2 py-2 rounded-lg text-xs font-medium text-nowrap transition-all duration-300 ${!switchButton
                                         ? "bg-white shadow text-blue-600"
                                         : "text-gray-500 hover:text-black"
                                         }`}
@@ -118,7 +118,7 @@ export default function Leads() {
                                 </button>
 
                                 <button onClick={() => setSwitchButton(true)}
-                                    className={`px-5 py-2 rounded-lg text-sm font-medium text-nowrap transition-all duration-300 ${switchButton
+                                    className={`px-2 py-2 rounded-lg text-xs font-medium text-nowrap transition-all duration-300 ${switchButton
                                         ? "bg-white shadow text-green-600"
                                         : "text-gray-500 hover:text-black"
                                         }`}

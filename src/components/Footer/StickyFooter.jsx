@@ -8,6 +8,7 @@ import {
     Package,
     PhoneCall,
     Settings,
+    Headphones,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 
@@ -19,13 +20,13 @@ const Stickyfooter = () => {
     const menus = [
         { href: "/dashboard", label: "Home", icon: House },
         { href: "/profile", label: "Profile", icon: User },
-        { href: "/leads", label: "Leads", icon: PhoneCall, center: true },
+        { href: "/leads", label: "Leads", icon: Headphones, center: true },
         { href: "/products", label: "Products", icon: Package },
         { href: "/settings", label: "Settings", icon: Settings },
     ];
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+        <div className="md:hidden fixed -bottom-0.5 left-0 right-0 z-50">
             <div className="bg-white border-t rounded-t-3xl shadow-xl px-3 pt-2 pb-2">
 
                 <div className="grid grid-cols-5 items-end">

@@ -3,7 +3,7 @@ import ProductForm from '@/components/Supplier/Product/ProductForm';
 import ProductGrid from '@/components/Supplier/Product/ProductGrid';
 import axios from 'axios';
 import { ArrowLeft, Plus, Search } from 'lucide-react'
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import NeedHelpModal from '@/components/Supplier/Product/NeedHelpModal';
@@ -15,6 +15,8 @@ export default function Products() {
   const [activeTab, setActiveTab] = useState("basic");
   const [description, setDescription] = useState("");
   const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -228,10 +230,39 @@ export default function Products() {
     setImages([])
     setEditId(null);
   };
-  console.log(products)
 
-  return (<div className="p-4 md:p-6 w-full bg-gray-100">
-    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6 bg-white px-4 py-3 rounded-xl shadow-sm">
+  const subCategories = useMemo(() => {
+    const unique = [];
+
+    products.forEach((p) => {
+      if (p.subCategory && !unique.find((x) => x._id === p.subCategory._id)) {
+        unique.push(p.subCategory);
+      }
+    });
+
+    return unique;
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((item) => {
+      const matchCategory =
+        !selectedSubCategory ||
+        item.subCategory?._id === selectedSubCategory;
+
+      const keyword = search.toLowerCase();
+
+      const matchSearch =
+        item.name?.toLowerCase().includes(keyword) ||
+        item.brandName?.toLowerCase().includes(keyword);
+
+      return matchCategory && matchSearch;
+    });
+  }, [products, search, selectedSubCategory]);
+
+  console.log(products, subCategories)
+
+  return (<div className="p-2 lg:p-6 w-full bg-gray-100">
+    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 lg:mb-6 mb-2 bg-white px-4 py-3 rounded-xl shadow-sm">
       <div className='flex items-center gap-3'>
         <h1 className="text-2xl font-bold text-gray-800">
           Products
@@ -251,10 +282,16 @@ export default function Products() {
       </div>
 
       <div className="flex items-center gap-2 w-full md:w-auto">
-        <select name="" className='input py-2.5! text-gray-600'>
-          <option value="">Select Category</option>
-          {/* <option value="">Ball Pens</option> */}
+        <select value={selectedSubCategory} onChange={(e) => setSelectedSubCategory(e.target.value)} className='input py-2.5! text-gray-600'>
+          <option value="">All Categories</option>
+
+          {subCategories.map((cat) => (
+            <option key={cat._id} value={cat._id}>
+              {cat.name}
+            </option>
+          ))}
         </select>
+
         <div className="relative w-full">
           <Search
             size={18}
@@ -262,6 +299,8 @@ export default function Products() {
           />
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
             className="input pl-8!"
           />
@@ -277,7 +316,7 @@ export default function Products() {
         />
 
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-xl shadow p-2 flex flex-wrap gap-1.5">
+          <div className="bg-white rounded-xl shadow p-2  md:flex hidden flex-wrap gap-1.5">
             {tabs.map((tab) => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition
@@ -285,6 +324,15 @@ export default function Products() {
                 {tab.label}
               </button>
             ))}
+          </div>
+
+          <div className="flex md:hidden justify-between">
+            <div className="w-full"></div>
+            <select onChange={(e) => setActiveTab(e.target.value)} className="input w-50! bg-white">
+              {tabs.map((i) => (
+                <option key={i.id} value={i.id}>{i.label}</option>
+              ))}
+            </select>
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow">
@@ -320,13 +368,13 @@ export default function Products() {
       </div>
     ) : (
       <ProductGrid
-        products={products}
+        products={filteredProducts}
         loading={loading}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
       />
     )}
 
-    <NeedHelpModal open={needHelp} onClose={() => setNeedHelp(false)} user={user} />
+    <NeedHelpModal issueType={"CATEGORY"} open={needHelp} onClose={() => setNeedHelp(false)} user={user} />
   </div>)
 }

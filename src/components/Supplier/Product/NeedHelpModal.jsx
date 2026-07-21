@@ -5,11 +5,11 @@ import toast from 'react-hot-toast';
 import Input from '@/components/Inputs/FormInput';
 import axios from 'axios';
 
-export default function NeedHelpModal({ open, onClose, user }) {
+export default function NeedHelpModal({ open, onClose, user, issueType }) {
     const [form, setForm] = useState({
         subject: "",
         description: "",
-        issueType: "CATEGORY",
+        issueType: issueType,
     });
 
     const handleChange = (e) => {
@@ -26,18 +26,22 @@ export default function NeedHelpModal({ open, onClose, user }) {
             if (!form.subject || !form.description) {
                 return toast.error("All fields are required");
             }
-            // console.log(form);
-            const res = await axios.post("/api/help", form, {
+
+            const payload = {
+                ...form,
+                issueType,
+            };
+
+            const res = await axios.post("/api/help", payload, {
                 headers: { "x-user-id": user?._id, },
             });
-            const data = res.data;
             toast.success("Help request submitted");
             // reset form
             setForm({
                 subject: "",
                 description: "",
                 supplierId: user?._id,
-                issueType: "CATEGORY",
+                issueType: issueType,
             });
             onClose();
         } catch (error) {

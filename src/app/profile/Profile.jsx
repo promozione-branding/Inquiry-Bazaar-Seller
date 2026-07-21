@@ -130,8 +130,8 @@ export default function Profile() {
   };
 
   return (
-    <div className="p-4 md:p-6 w-full bg-gray-100">
-      <div className="grid lg:grid-cols-3 gap-5">
+    <div className="p-2 xl:p-6 w-full bg-gray-100">
+      <div className="grid lg:grid-cols-3 xl:gap-5 gap-3">
         <div className="bg-white p-6 rounded-xl shadow space-y-4 h-fit relative">
           <div onClick={() => setEditModal(true)} className="absolute top-2 right-2 rounded-full p-2 bg-blue-50 hover:bg-[#def1ff] text-[#0a5183]">
             <Edit size={16} />
@@ -231,7 +231,7 @@ export default function Profile() {
         </div>
 
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-xl shadow p-2 flex flex-wrap gap-1.5">
+          <div className="bg-white rounded-xl shadow p-2 md:flex hidden flex-wrap gap-1.5">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -243,6 +243,15 @@ export default function Profile() {
                 </button>
               );
             })}
+          </div>
+
+          <div className="flex md:hidden justify-between">
+            <div className="w-full"></div>
+            <select onChange={(e) => setActiveTab(e.target.value)} className="input w-50! bg-white">
+              {tabs.map((i) => (
+                <option key={i.id} value={i.id}>{i.label}</option>
+              ))}
+            </select>
           </div>
 
           {/* Content Box */}

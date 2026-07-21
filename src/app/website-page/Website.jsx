@@ -213,13 +213,13 @@ export default function Website() {
     }, [user]);
 
     return (<>
-        <div className="py-6 px-4 w-full bg-gray-100">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="md:py-6 py-3 md:px-4 px-2 w-full bg-gray-100">
+            <div className="grid grid-cols-3 lg:grid-cols-6 md:gap-4 gap-2">
                 {sectionItems.map((item, index) => {
                     const Icon = item.icon;
                     return (
                         <div key={index} onClick={() => setSection(item.key)}
-                            className="h-46 flex flex-col items-center justify-center p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer bg-white hover:scale-105"
+                            className="md:h-46 h-30 flex flex-col items-center justify-center md:p-6 p-2 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer bg-white hover:scale-105"
                         >
                             <div className={`p-4 rounded-full mb-3 ${item.color}`}>
                                 <Icon size={28} />
@@ -232,7 +232,7 @@ export default function Website() {
                 })}
             </div>
 
-            <div className='mt-5 grid lg:grid-cols-3 gap-5'>
+            <div className='md:mt-5 mt-3 grid lg:grid-cols-3 md:gap-5 gap-3'>
                 <WebpageImage
                     section={section}
                     setForm={setForm}

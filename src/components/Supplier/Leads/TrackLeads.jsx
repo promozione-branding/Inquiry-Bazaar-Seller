@@ -20,7 +20,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 export default function TrackLeads({ trackingData, search, view, loading, SkeletonCard }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = 15;
 
   const filteredLeads = useMemo(() => {
     if (!search?.trim()) return trackingData;
@@ -507,7 +507,7 @@ export default function TrackLeads({ trackingData, search, view, loading, Skelet
           )}
         </div>}
 
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 px-5 py-4 border-t border-gray-200 bg-white">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 border-t border-gray-200 bg-white">
         <p className="text-sm text-gray-500">
           Showing{" "}
           <span className="font-medium">
