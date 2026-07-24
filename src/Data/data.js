@@ -233,3 +233,10 @@ export const locations = [
         ]
     }
 ]
+
+export const trunover = [
+    "50l to 1cr",
+    "1cr to 5cr",
+    "5cr to 10cr",
+    "Upto 10cr",
+];

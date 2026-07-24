@@ -8,6 +8,7 @@ import { logout } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { FiBell, FiShoppingBag, FiUser } from "react-icons/fi";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -64,6 +65,40 @@ export default function Navbar() {
     };
   }, []);
 
+  const [leadsData, setLeadsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        setLoading(true);
+
+        const todayRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=today`
+        );
+
+        if (todayRes.data.success && todayRes.data.data?.length > 0) {
+          setLeadsData(todayRes.data.data);
+          return;
+        }
+
+        const previousRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=all`
+        );
+
+        if (previousRes.data.success) {
+          setLeadsData(previousRes.data.data || []);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user?._id) {
+      fetchLeads();
+    }
+  }, [user]);
+
   // console.log(businessDetails)
 
   return (
@@ -87,10 +122,79 @@ export default function Navbar() {
               </button>
 
               {bellOpen && (
-                <div className="absolute right-0 mt-1 w-70 bg-white shadow-lg rounded-lg border border-gray-300">
-                  <div className="p-4 border-b border-b-gray-300">
-                    <p className="font-semibold text-black text-center">No Notification yet.</p>
+                <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-300">
+                    <div className="flex items-center gap-2">
+                      <FiBell className="text-blue-600 text-lg" />
+                      <h3 className="font-semibold text-gray-800">Notifications</h3>
+                    </div>
+
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                      {leadsData.length}
+                    </span>
                   </div>
+
+                  {/* Body */}
+                  <div className="max-h-60 overflow-y-auto">
+                    {loading ? (
+                      <div className="p-6 text-center text-gray-500">
+                        Loading...
+                      </div>
+                    ) : leadsData.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center p-8 text-gray-500">
+                        <FiBell className="text-4xl mb-2 text-gray-300" />
+                        <p>No notifications yet.</p>
+                      </div>
+                    ) : (
+                      leadsData.map((item) => (
+                        <div
+                          key={item._id}
+                          className="flex gap-3 p-4 border-b border-gray-200 hover:bg-blue-50 transition cursor-pointer"
+                        >
+                          {/* Icon */}
+                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <FiShoppingBag className="text-blue-600 text-lg" />
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-semibold text-gray-800 capitalize flex items-center gap-1">
+                                  <FiUser className="text-gray-500" />
+                                  {item.name}
+                                </h4>
+
+                                <p className="text-sm text-gray-700 mt-1 line-clamp-1">
+                                  Interested in {item.product}
+                                </p>
+                              </div>
+
+                              <span className="text-[10px] text-gray-600 whitespace-nowrap">
+                                {new Date(item.createdAt).toLocaleString([], {
+                                  day: "2-digit",
+                                  month: "short",
+                                  // year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  {leadsData.length > 0 && (
+                    <div className="p-3 text-center border-t border-gray-300 bg-gray-50">
+                      <button className="text-blue-600 text-sm font-medium hover:underline">
+                        View All Notifications
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
