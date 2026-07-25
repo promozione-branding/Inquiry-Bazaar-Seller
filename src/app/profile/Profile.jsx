@@ -18,6 +18,8 @@ import {
   Youtube,
   Twitter,
   Camera,
+  User,
+  CreditCard,
 } from "lucide-react";
 import BusinessForm from "@/components/Supplier/Profile/BusinessForm";
 import BankForm from "@/components/Supplier/Profile/BankForm";
@@ -28,6 +30,12 @@ import EditModal from "@/components/Supplier/Profile/EditModal";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { setUser } from "@/redux/slices/authSlice";
+import Review from "@/components/Supplier/Profile/Review";
+import Docs from "@/components/Supplier/Profile/Docs";
+import { FaArrowRight, FaCrown } from "react-icons/fa";
+import Modal from "@/components/Modal/Modal";
+import SelectInput from "@/components/Inputs/SelectInput";
+import Input from "@/components/Inputs/FormInput";
 
 export default function Profile() {
   const dispatch = useDispatch();
@@ -35,6 +43,9 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState("business");
   const [editModal, setEditModal] = useState(false);
   const [businessDetails, setBusinessDetails] = useState("");
+  const [modelOpen, setModelOper] = useState(false)
+  const [plan, setPlan] = useState("")
+  const [loading1, setLoading1] = useState(false);
 
   const tabs = [
     { id: "business", label: "Business", icon: Building2 },
@@ -127,6 +138,46 @@ export default function Profile() {
       success: "Profile image updated!",
       error: (err) => err.message || "Upload failed",
     });
+  };
+
+  const handleSubmit = async () => {
+    if (plan === "") return toast.error("Select your plan first")
+
+    const data = {
+      supplierToken: "7303486777",
+      platform: "Seller Profile",
+      platformEmail: "lead.inquirybazaar@gmail.com",
+      name: user?.name || "NA",
+      email: user?.email || "NA",
+      company: businessDetails?.companyName || "NA",
+      phone: user?.phone || "NA",
+      product: `${plan} plan` || "NA",
+      place: businessDetails?.address || "NA",
+      message: "Inquiry for membership plan",
+    };
+
+    // if (!/^\d{10}$/.test(user?.phone)) {
+    //   return toast.error("Enter a valid 10-digit phone number");
+    // }
+
+    try {
+      setLoading1(true);
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/add`, data,
+        { validateStatus: (status) => status >= 200 && status < 500 }
+      );
+      if (res.status >= 200 && res.status < 300) {
+        toast.success("Message send successfully");
+        setTimeout(() => {
+          setModelOper(false);
+        }, 1000);
+        setPlan("")
+      }
+    } catch (err) {
+      console.log("ERROR:", err?.response || err.message);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading1(false);
+    }
   };
 
   return (
@@ -271,9 +322,105 @@ export default function Profile() {
             {activeTab === "social" && (
               <SocialForm user={user} businessId={businessDetails?._id} />
             )}
+
+            {activeTab === "reviews" && (
+              <Review user={user} businessId={businessDetails?._id} />
+            )}
+
+            {activeTab === "docs" && (
+              <Docs user={user._id} />
+            )}
+
+            {activeTab === "performance" && (
+              <div className="flex items-center justify-center py-0 px-4">
+                <div className="max-w-lg w-full rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-8 text-center shadow-sm">
+                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
+                    <FaCrown className="text-3xl text-amber-500" />
+                  </div>
+
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Upgrade Your Account
+                  </h2>
+
+                  <p className="mt-3 text-gray-600">
+                    Performance analytics are available exclusively for Premium members.
+                    Upgrade your account to unlock detailed insights, advanced reports, and
+                    additional features.
+                  </p>
+
+                  <button onClick={() => setModelOper(true)} // Change route if needed
+                    className="mt-8 inline-flex items-center gap-2 rounded-lg bg-amber-500 px-6 py-3 font-medium text-white transition hover:bg-amber-600"
+                  >
+                    Upgrade Now
+                    <FaArrowRight />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      <Modal open={modelOpen} onClose={() => setModelOper(false)}>
+        <Modal.Header title="Contact Us" />
+        <Modal.Body>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              <SelectInput
+                label="Membership Plan"
+                Icon={CreditCard}
+                name="membershipPlan"
+                value={plan}
+                onChange={(e) => setPlan(e.target.value)}
+                options={["Elite", "Pro", "Growth", "Starter"].map((c) => ({
+                  label: c,
+                  value: c,
+                }))}
+              />
+              <Input
+                label="Your Name"
+                type="text"
+                Icon={User}
+                name="name"
+                disabled
+                value={user?.name}
+              // onChange={handleChange}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                label="Your Phone"
+                type="tel"
+                Icon={Phone}
+                name="phone"
+                disabled
+                value={user?.phone}
+              // onChange={handleChange}
+              />
+              <Input
+                label="Your Email"
+                type="text"
+                Icon={Mail}
+                name="email"
+                disabled
+                value={user?.email}
+              // onChange={handleChange}
+              />
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className='flex justify-end gap-2'>
+            <button disabled={loading1} onClick={handleSubmit} className="px-4 py-2 rounded-md text-white bg-[#f45a06] hover:bg-[#e45407]">
+              {loading1 ? "Sending..." : "Send"}
+            </button>
+            <button onClick={() => setModelOper(false)} className="border border-gray-300 px-4 py-2 rounded-md text-black bg-gray-100 hover:bg-gray-200">
+              Close
+            </button>
+          </div>
+        </Modal.Footer>
+      </Modal>
 
       <EditModal
         open={editModal}

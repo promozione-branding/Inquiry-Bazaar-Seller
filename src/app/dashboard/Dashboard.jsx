@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   User,
@@ -34,49 +34,21 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaPhone, FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
 import Modal from "@/components/Modal/Modal";
 import SelectInput from "@/components/Inputs/SelectInput";
 import Input from "@/components/Inputs/FormInput";
 
 export default function Dashboard() {
   const { user } = useSelector((state) => state.auth);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
   const [modelOpen, setModelOper] = useState(false)
   const [plan, setPlan] = useState("")
   const [businessDetails, setBusinessDetails] = useState(null)
   const [leadsData, setLeadsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loading1, setLoading1] = useState(false);
-  const fetchBusiness = async () => {
-    try {
-      const res = await axios.get("/api/profile/business", {
-        headers: { "x-user-id": user?._id, },
-      });
-
-      if (res.data?.data) {
-        setBusinessDetails(res.data?.data)
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to load data");
-    }
-  };
-
-  const inquiries = [
-    { company: "ABC Industries", product: "Steel Pipes", date: "12 Jun" },
-    { company: "BuildTech", product: "Industrial Valves", date: "11 Jun" },
-    { company: "Global Supply", product: "Copper Wire", date: "10 Jun" },
-    { company: "Global Supply", product: "Copper Wire", date: "10 Jun" },
-    { company: "Metro Infra", product: "Construction Material", date: "09 Jun" },
-    { company: "Vision Engineering", product: "Machine Parts", date: "08 Jun" },
-  ];
-
-  const categories = [
-    "Industrial",
-    "Machinery",
-    "Construction",
-    "Electrical",
-  ];
+  const [products, setProducts] = useState([]);
 
   const card = {
     hidden: { opacity: 0, y: 18 },
@@ -84,40 +56,6 @@ export default function Dashboard() {
   };
 
   const [showingPrevious, setShowingPrevious] = useState(false);
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        setLoading(true);
-
-        const todayRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=today`
-        );
-
-        if (todayRes.data.success && todayRes.data.data?.length > 0) {
-          setLeadsData(todayRes.data.data);
-          setShowingPrevious(false);
-          return;
-        }
-
-        const previousRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=all`
-        );
-
-        if (previousRes.data.success) {
-          setLeadsData(previousRes.data.data || []);
-          setShowingPrevious(true);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (user?._id) {
-      fetchBusiness();
-      fetchLeads();
-    }
-  }, [user]);
 
   const handleSubmit = async () => {
     if (plan === "") return toast.error("Select your plan first")
@@ -159,6 +97,135 @@ export default function Dashboard() {
     }
   };
 
+  const subCategories = useMemo(() => {
+    const unique = [];
+
+    products.forEach((p) => {
+      if (p.subCategory && !unique.find((x) => x._id === p.subCategory._id)) {
+        unique.push(p.subCategory);
+      }
+    });
+
+    return unique;
+  }, [products]);
+
+  const fetchBusiness = async () => {
+    const res = await axios.get("/api/profile/business", {
+      headers: { "x-user-id": user?._id },
+    });
+
+    if (res.data?.data) {
+      setBusinessDetails(res.data.data);
+    }
+  };
+
+  const getProducts = async () => {
+    const res = await axios.get(`/api/product?supplierId=${user._id}`);
+    setProducts(res.data.data);
+  };
+
+  const fetchLeads = async () => {
+    try {
+      const todayRes = await axios.get(
+        `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=today`
+      );
+
+      if (todayRes.data.success && todayRes.data.data?.length > 0) {
+        setLeadsData(todayRes.data.data);
+        setShowingPrevious(false);
+        return;
+      }
+
+      const previousRes = await axios.get(
+        `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/form/get-forms/${user?._id}?filter=all`
+      );
+
+      if (previousRes.data.success) {
+        setLeadsData(previousRes.data.data || []);
+        setShowingPrevious(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      if (!user?._id) return;
+
+      try {
+        setDashboardLoading(true);
+
+        await Promise.all([
+          fetchBusiness(),
+          fetchLeads(),
+          getProducts(),
+        ]);
+      } finally {
+        setDashboardLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, [user]);
+
+  if (dashboardLoading) {
+    return (
+      <div className="w-full min-h-screen bg-slate-100 p-2 xl:p-6 animate-pulse">
+        <div className="max-w-7xl mx-auto space-y-6">
+
+          {/* Top Cards */}
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="bg-white rounded-3xl h-44 p-6 shadow-sm"
+              >
+                <div className="h-5 w-28 bg-slate-200 rounded mb-4" />
+                <div className="h-10 w-20 bg-slate-200 rounded mb-4" />
+                <div className="space-y-2">
+                  <div className="h-3 bg-slate-200 rounded" />
+                  <div className="h-3 w-3/4 bg-slate-200 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Main Section */}
+          <div className="grid lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2 bg-white rounded-3xl p-6">
+              <div className="h-6 w-40 bg-slate-200 rounded mb-6" />
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    key={i}
+                    className="border border-gray-200 rounded-2xl p-4"
+                  >
+                    <div className="h-4 w-32 bg-slate-200 rounded mb-3" />
+                    <div className="h-3 w-20 bg-slate-200 rounded mb-2" />
+                    <div className="h-3 w-full bg-slate-200 rounded" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl p-6">
+              <div className="h-24 w-24 rounded-full bg-slate-200 mx-auto mb-4" />
+              <div className="h-5 w-40 bg-slate-200 rounded mx-auto mb-3" />
+              <div className="space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-4 bg-slate-200 rounded" />
+                ))}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-screen bg-slate-100 p-2 xl:p-6">
       <div className="max-w-7xl mx-auto md:space-y-6 space-y-3">
@@ -193,9 +260,15 @@ export default function Dashboard() {
                   <Phone size={16} />
                   +917303486777
                 </a>
-                <a href="tel:+917303486777" className="flex gap-1 items-center bg-blue-500 text-xs hover:bg-blue-600 p-2 rounded-md text-white">
-                  <PhoneCall size={14} /> Contact Now
-                </a>
+
+                <div className="flex gap-2 items-center">
+                  <a href="tel:+917303486777" className="flex gap-1 items-center bg-red-600 text-xs hover:bg-red-700 p-2 rounded-md text-white">
+                    <FaPhoneAlt size={18} />
+                  </a>
+                  <a href="https://wa.me/917303486777" target="blank" className="flex items-center bg-green-600 text-xs hover:bg-green-700 p-2 rounded-md text-white">
+                    <FaWhatsapp size={20} />
+                  </a>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -212,9 +285,8 @@ export default function Dashboard() {
                 </p>
 
                 <h2 className="text-5xl font-bold mt-3">
-                  10
+                  {products.length || "NA"}
                 </h2>
-
               </div>
 
               <Package size={40} />
@@ -226,9 +298,9 @@ export default function Dashboard() {
           </motion.div>
 
           <motion.div variants={card} initial="hidden" animate="show" transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl p-6 shadow-sm"
+            className="bg-white rounded-3xl p-2 shadow-sm"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-2">
 
               <div>
                 <p className="text-slate-500">
@@ -236,17 +308,23 @@ export default function Dashboard() {
                 </p>
 
                 <h2 className="text-2xl font-bold">
-                  4 Categories
+                  {subCategories.length} Categories
                 </h2>
               </div>
 
               <FolderKanban className="text-indigo-600" />
             </div>
 
-            <div className="flex flex-wrap gap-2 mt-4">
-              {categories.map((item) => (
-                <span key={item} className="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-medium">
-                  {item}
+            <div className="flex flex-wrap gap-2 mt-2 max-h-30 overflow-x-auto pr-1
+    [&::-webkit-scrollbar]:w-1.5
+    [&::-webkit-scrollbar-track]:rounded-full
+    [&::-webkit-scrollbar-track]:bg-slate-100
+    [&::-webkit-scrollbar-thumb]:rounded-full
+    [&::-webkit-scrollbar-thumb]:bg-indigo-400
+    hover:[&::-webkit-scrollbar-thumb]:bg-indigo-600">
+              {subCategories.map((item) => (
+                <span key={item} className="px-2 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-medium">
+                  {item.name}
                 </span>
               ))}
             </div>
@@ -327,25 +405,7 @@ export default function Dashboard() {
               </div>
             )}
 
-            {loading ? (
-              // Loading Skeleton
-              <div className="grid md:grid-cols-2 gap-2">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i}
-                    className="border border-slate-200 rounded-2xl p-4 animate-pulse"
-                  >
-                    <div className="flex justify-between">
-                      <div className="space-y-2 w-full">
-                        <div className="h-4 w-32 bg-slate-200 rounded" />
-                        <div className="h-3 w-24 bg-slate-100 rounded" />
-                      </div>
-
-                      <div className="h-3 w-12 bg-slate-100 rounded" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : leadsData.length > 0 ? (
+            {leadsData.length > 0 ? (
               <div className="grid md:grid-cols-2 gap-2">
                 {leadsData.slice(0, 6).map((item, i) => (
                   <motion.div key={i} whileHover={{ y: -2 }}
@@ -384,15 +444,20 @@ export default function Dashboard() {
             </h2>
             <div className="flex items-center gap-4">
               <div className="w-24 h-24 rounded-lg overflow-hidden bg-white border border-gray-200">
-                <img
-                  src={user?.profileImage || "/no-image.png"}
-                  alt="company"
-                  className="h-full w-full object-cover"
-                />
+                {user?.profileImage ? (
+                  <img
+                    src={user.profileImage}
+                    alt="company"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="text-5xl font-bold bg-gray-100 text-slate-700 items-center h-full flex justify-center">
+                    {businessDetails?.companyName?.charAt(0).toUpperCase() || "N"}
+                  </div>
+                )}
               </div>
 
               <div>
-
                 <h3 className="text-2xl font-bold text-slate-800">
                   {businessDetails?.companyName}
                 </h3>
@@ -408,7 +473,7 @@ export default function Dashboard() {
             </div>
 
             <div className="mt-4 space-y-2">
-              <div className="grid grid-cols-2">
+              <div className="grid xl:grid-cols-2 gap-2">
                 <InfoRow
                   icon={<User2 size={18} />}
                   label="CEO"

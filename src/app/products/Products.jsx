@@ -259,7 +259,7 @@ export default function Products() {
     });
   }, [products, search, selectedSubCategory]);
 
-  console.log(products, subCategories)
+  // console.log(products, subCategories)
 
   return (<div className="p-2 lg:p-6 w-full bg-gray-100">
     <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 lg:mb-6 mb-2 bg-white px-4 py-3 rounded-xl shadow-sm">

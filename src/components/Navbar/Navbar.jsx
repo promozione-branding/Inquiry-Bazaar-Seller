@@ -122,7 +122,7 @@ export default function Navbar() {
               </button>
 
               {bellOpen && (
-                <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
+                <div className="absolute -right-6 sm:right-0 mt-1 sm:mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-300">
                     <div className="flex items-center gap-2">
@@ -150,23 +150,23 @@ export default function Navbar() {
                       leadsData.map((item) => (
                         <div
                           key={item._id}
-                          className="flex gap-3 p-4 border-b border-gray-200 hover:bg-blue-50 transition cursor-pointer"
+                          className="flex gap-2 p-2 border-b border-gray-200 hover:bg-blue-50 transition cursor-pointer"
                         >
                           {/* Icon */}
-                          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <FiShoppingBag className="text-blue-600 text-lg" />
+                          <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <FiShoppingBag className="text-blue-600 text-sm" />
                           </div>
 
                           {/* Content */}
                           <div className="flex-1">
                             <div className="flex justify-between items-start">
                               <div>
-                                <h4 className="font-semibold text-gray-800 capitalize flex items-center gap-1">
+                                <h4 className="font-semibold text-sm text-gray-800 capitalize flex items-center gap-1">
                                   <FiUser className="text-gray-500" />
                                   {item.name}
                                 </h4>
 
-                                <p className="text-sm text-gray-700 mt-1 line-clamp-1">
+                                <p className="text-xs text-gray-700 mt-1 line-clamp-1">
                                   Interested in {item.product}
                                 </p>
                               </div>
@@ -198,6 +198,7 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+
             <div className="relative" ref={profileRef}>
               <button onClick={() => setProfileOpen(!profileOpen)}
                 className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-black" >
