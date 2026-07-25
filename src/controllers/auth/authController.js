@@ -11,10 +11,22 @@ export const registerUser = async (data) => {
   } = data;
 
   // CHECK USER
-  const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({
+    role: "supplier",
+    $or: [
+      { email },
+      { phone },
+    ],
+  });
 
   if (userExists) {
-    throw new Error("User already exists");
+    if (userExists.email === email) {
+      throw new Error("Email already exists.");
+    }
+
+    if (userExists.phone === phone) {
+      throw new Error("Phone number already exists.");
+    }
   }
 
   // HASH PASSWORD
@@ -33,7 +45,33 @@ export const registerUser = async (data) => {
 };
 
 export const updateUser = async (userId, data) => {
-  return await User.findByIdAndUpdate(userId,
-    { $set: data, }, { new: true, }
+  const { email, phone } = data;
+
+  // Check if another supplier already has the same email or phone
+  if (email || phone) {
+    const existingSupplier = await User.findOne({
+      _id: { $ne: userId }, // Exclude current user
+      role: "supplier",
+      $or: [
+        ...(email ? [{ email }] : []),
+        ...(phone ? [{ phone }] : []),
+      ],
+    });
+
+    if (existingSupplier) {
+      if (email && existingSupplier.email === email) {
+        throw new Error("Email already exists.");
+      }
+
+      if (phone && existingSupplier.phone === phone) {
+        throw new Error("Phone number already exists.");
+      }
+    }
+  }
+
+  return await User.findByIdAndUpdate(
+    userId,
+    { $set: data },
+    { new: true }
   );
 };

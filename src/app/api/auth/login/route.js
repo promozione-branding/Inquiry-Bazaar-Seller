@@ -11,7 +11,7 @@ export async function POST(req) {
     await connectDB();
 
     const { email, password } = await req.json();
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, role: "supplier" });
 
     if (!user) {
       return NextResponse.json(

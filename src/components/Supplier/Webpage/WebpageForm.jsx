@@ -386,23 +386,23 @@ function FAQSection({ form, setForm }) {
     };
 
     const addFAQ = () => {
-        const last = form?.faqSection?.faqs?.at(-1);
+        setForm(prev => {
+            const faqs = prev.faqSection?.faqs || [];
+            const last = faqs.at(-1);
 
-        if (last && (!last?.question || !last?.answer)) {
-            toast.error("Please fill current FAQ first");
-            return;
-        }
+            if (last && (!last.question || !last.answer)) {
+                toast.error("Please fill current FAQ first");
+                return prev;
+            }
 
-        setForm((prev) => ({
-            ...prev,
-            faqSection: {
-                ...prev?.faqSection,
-                faqs: [
-                    ...prev?.faqSection?.faqs,
-                    { question: "", answer: "" },
-                ],
-            },
-        }));
+            return {
+                ...prev,
+                faqSection: {
+                    ...prev.faqSection,
+                    faqs: [...faqs, { question: "", answer: "" }],
+                },
+            };
+        });
     };
 
     const removeFAQ = (index) => {
@@ -442,7 +442,7 @@ function FAQSection({ form, setForm }) {
 
             {/* FAQ List */}
             <div className="space-y-4">
-                {form?.faqSection?.faqs.map((faq, index) => (
+                {(form?.faqSection?.faqs || []).map((faq, index) => (
                     <div key={index} className="grid md:grid-cols-2 gap-5">
 
                         {/* Question */}

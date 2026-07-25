@@ -6,14 +6,12 @@ const userSchema = new mongoose.Schema(
 
     email: {
       type: String,
-      unique: true,
     },
 
     phone: String,
 
     otherEmail: {
       type: String,
-      // unique: true,
     },
 
     otherPhone: String,

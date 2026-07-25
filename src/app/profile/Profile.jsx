@@ -76,7 +76,7 @@ export default function Profile() {
       toast.success("Profile updated");
       setEditModal(false)
     } catch (err) {
-      toast.error("Update failed");
+      toast.error(err.response?.data?.error || err.message);
     }
   }
 
