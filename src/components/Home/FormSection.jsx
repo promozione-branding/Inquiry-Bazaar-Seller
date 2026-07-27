@@ -99,11 +99,11 @@ export default function FormSection() {
     };
 
     return (
-        <div className="h-[80vh] md:h-[70vh] bg-cover bg-center bg-no-repeat flex md:items-center items-start"
+        <div className="h-[80vh] md:h-[50vh] lg:h-[60vh] xl:h-[70vh] bg-cover bg-center bg-no-repeat flex md:items-center items-start"
             style={{ backgroundImage: "url('/banner.webp')", }}>
 
             <div className="max-w-7xl mx-auto w-full px-4">
-                <div className="grid md:grid-cols-2 gap-10 items-center">
+                <div className="grid lg:grid-cols-2 gap-10 items-center">
 
                     {/* Left side empty for image visibility */}
                     <div></div>

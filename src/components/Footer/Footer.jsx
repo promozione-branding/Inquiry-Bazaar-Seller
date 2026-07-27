@@ -265,7 +265,7 @@ export default function Footer() {
                             Subscribe to Newsletter
                         </p>
 
-                        <div className="flex flex-col sm:flex-row bg-[#f3f3f3] rounded-full overflow-hidden">
+                        <div className="flex flex-col xl:flex-row bg-[#f3f3f3] rounded-full overflow-hidden">
                             <input
                                 type="email"
                                 value={email}

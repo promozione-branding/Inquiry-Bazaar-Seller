@@ -14,9 +14,11 @@ import {
   Eye,
 } from "lucide-react";
 import { FaWhatsapp } from 'react-icons/fa';
+import Modal from '@/components/Modal/Modal';
 
 export default function InquiryLeads({ leadsData, search, view, loading, SkeletonCard }) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [detail, setDetails] = useState(false);
   const itemsPerPage = 9;
 
   const filteredLeads = useMemo(() => {
@@ -165,7 +167,7 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
                           </div>
 
                           <div>
-                            <p className="font-medium">
+                            <p className="font-medium line-clamp-1 w-60">
                               {lead.product}
                             </p>
                           </div>
@@ -234,9 +236,16 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
 
                     {/* ACTIONS */}
                     <td className="px-2 py-2">
-
                       <div className="flex gap-3 justify-center">
-
+                        <button
+                          onClick={() => setDetails(lead)}
+                          className="w-10 h-10 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition"
+                        >
+                          <Eye
+                            size={20}
+                            className="text-blue-600"
+                          />
+                        </button>
                         <button
                           onClick={() =>
                             window.open(
@@ -268,9 +277,7 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
                             className="text-green-600"
                           />
                         </button>
-
                       </div>
-
                     </td>
                   </tr>
                 ))
@@ -535,8 +542,7 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
               </p>
             </div>
           )}
-        </div>
-      }
+        </div>}
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 border-t border-gray-200 bg-white">
         <p className="text-sm text-gray-500">
@@ -582,6 +588,227 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
           </button>
         </div>
       </div>
-    </div >
+
+      <Modal open={detail} onClose={() => setDetails(false)}>
+        <Modal.Header title="Lead Details" />
+        <Modal.Body>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -4 }} transition={{ duration: 0.25 }}
+            className="group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+          >
+            <div className="px-4 py-3 border-b border-gray-200">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative shrink-0">
+                    <div className="w-11 h-11 rounded-xl bg-[#074977]/10 border border-[#074977]/10 flex items-center justify-center">
+                      <User
+                        size={20}
+                        className="text-[#074977]"
+                      />
+                    </div>
+
+                    <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white bg-green-500" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <h3 className="text-[16px] font-semibold text-gray-800 truncate">
+                      {detail?.name}
+                    </h3>
+
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Globe
+                        size={13}
+                        className="text-[#074977]"
+                      />
+
+                      <p className="text-sm text-gray-500 truncate">
+                        {detail?.platform?.replace("https://", "")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => window.open(`tel:${detail?.phone}`)}
+                    className="w-10 h-10 rounded-xl bg-[#D01132]/10 hover:bg-[#D01132]/20 flex items-center justify-center transition shrink-0"
+                  >
+                    <Phone size={20} className="text-[#D01132]" />
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      window.open(
+                        `https://wa.me/${String(
+                          detail?.whatsapp || detail?.phone,
+                        ).replace(/\D/g, "")}`,
+                        "_blank",
+                      )
+                    }
+                    className="w-10 h-10 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition shrink-0"
+                  >
+                    <FaWhatsapp size={23} className="text-green-600" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-4 py-2.5 space-y-3">
+              <div className="space-y-2.5">
+                {detail?.platformEmail && (
+                  <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-blue-50 transition rounded-xl px-4 py-2">
+                    <div className="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                      <Mail
+                        size={17}
+                        className="text-blue-600"
+                      />
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-800 mb-0.5">
+                        Platform Email
+                      </p>
+
+                      <p className="text-sm font-medium text-gray-800 truncate">
+                        {detail?.platformEmail}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-red-50 transition rounded-xl px-4 py-2">
+                  <div className="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                    <Phone
+                      size={17}
+                      className="text-[#D01132]"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-800 mb-0.5">
+                      Phone
+                    </p>
+
+                    <p className="text-sm font-medium text-gray-800">
+                      {detail?.phone}
+                    </p>
+                  </div>
+                </div>
+
+                {detail.email && (
+                  <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-cyan-50 transition rounded-xl px-4 py-2">
+                    <div className="w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center shrink-0">
+                      <Mail
+                        size={17}
+                        className="text-cyan-600"
+                      />
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-800 mb-0.5">
+                        User Email
+                      </p>
+
+                      <p className="text-sm font-medium text-gray-800 truncate">
+                        {detail?.email}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {detail?.place && (
+                  <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-orange-50 transition rounded-xl px-4 py-2">
+                    <div className="w-11 h-11 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
+                      <MapPin
+                        size={17}
+                        className="text-orange-600"
+                      />
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-gray-800 mb-0.5">
+                        Location
+                      </p>
+
+                      <p className="text-sm font-medium text-gray-800">
+                        {detail?.place}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {detail?.priceRange && (
+                  <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-green-50 transition rounded-xl px-4 py-2">
+                    <div className="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+                      <IndianRupee
+                        size={17}
+                        className="text-green-600"
+                      />
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-gray-800 mb-0.5">
+                        Budget
+                      </p>
+
+                      <p className="text-sm font-medium text-gray-800">
+                        {detail?.priceRange}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {detail?.product && (
+                  <div className="border border-gray-100 flex items-center gap-3 bg-gray-50 hover:bg-indigo-50 transition rounded-xl px-4 py-2">
+                    <div className="w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center shrink-0">
+                      <Building2
+                        size={17}
+                        className="text-indigo-600"
+                      />
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-800 mb-0.5">
+                        Product
+                      </p>
+
+                      <p className="text-sm font-medium text-gray-800 truncate">
+                        {detail?.product}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {detail?.message && (
+                <div className="rounded-xl border border-[#074977]/10 bg-gradient-to-br from-[#074977]/5 to-[#D01132]/5 px-4 py-3">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <MessageSquare
+                      size={16}
+                      className="text-[#074977]"
+                    />
+
+                    <p className="text-sm font-semibold text-gray-800">
+                      Message
+                    </p>
+                  </div>
+
+                  <p className="text-sm text-gray-600 leading-6">
+                    {detail?.message}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </Modal.Body>
+        {/* <Modal.Footer>
+          <div className='flex justify-end gap-2'>
+            <button onClick={""} className="border border-gray-300 px-4 py-2 rounded-md text-black bg-gray-100 hover:bg-gray-200">
+              Close
+            </button>
+          </div>
+        </Modal.Footer> */}
+      </Modal>
+    </div>
   )
 }

@@ -8,6 +8,9 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import NeedHelpModal from '@/components/Supplier/Product/NeedHelpModal';
 import ImageForm from '@/components/Supplier/Product/ImageForm';
+import ImageUploader from '@/components/ImageUploader/ImageUploader';
+import ImageEditorModal from '@/components/Supplier/Product/ImageEditorModal';
+import { removeBackground } from '@imgly/background-removal';
 
 export default function Products() {
   const { user } = useSelector((state) => state.auth);
@@ -22,6 +25,7 @@ export default function Products() {
   const [saving, setSaving] = useState(false);
   const [needHelp, setNeedHelp] = useState(false);
   const [images, setImages] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(null);
 
   const tabs = [
     { id: "basic", label: "Basic Info" },
@@ -259,9 +263,7 @@ export default function Products() {
     });
   }, [products, search, selectedSubCategory]);
 
-  // console.log(products, subCategories)
-
-  return (<div className="p-2 lg:p-6 w-full bg-gray-100">
+  return (<div className="p-2 xl:p-6 w-full bg-gray-100">
     <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 lg:mb-6 mb-2 bg-white px-4 py-3 rounded-xl shadow-sm">
       <div className='flex items-center gap-3'>
         <h1 className="text-2xl font-bold text-gray-800">
@@ -309,11 +311,22 @@ export default function Products() {
     </div>
 
     {isAddActive ? (
-      <div className="grid lg:grid-cols-3 gap-5">
-        <ImageForm
+      <div className="grid lg:grid-cols-3 xl:gap-5 gap-3">
+        <ImageUploader
           images={images}
           setImages={setImages}
+          openEditor={setSelectedIndex}
         />
+
+        <ImageEditorModal
+          open={selectedIndex !== null}
+          image={images[selectedIndex]}
+          index={selectedIndex}
+          images={images}
+          setImages={setImages}
+          onClose={() => setSelectedIndex(null)}
+        />
+
 
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-white rounded-xl shadow p-2  md:flex hidden flex-wrap gap-1.5">
