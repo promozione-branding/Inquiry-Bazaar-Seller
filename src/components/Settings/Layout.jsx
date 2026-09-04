@@ -16,6 +16,7 @@ import SignOut from "./SignOut";
 import DisableAccount from "./DisableAccount";
 import Notification from "./Notification";
 import Language from "./Language";
+import Integration from "./Integration";
 
 export default function Layout({ layout, setLayout, user }) {
     const router = useRouter();
@@ -50,6 +51,11 @@ export default function Layout({ layout, setLayout, user }) {
             case "language":
                 return (
                     <Language setLayout={setLayout} user={user} />
+                );
+
+            case "integration":
+                return (
+                    <Integration setLayout={setLayout} user={user} />
                 );
 
             // PROFILE SETTINGS

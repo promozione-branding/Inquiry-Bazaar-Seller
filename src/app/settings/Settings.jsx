@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import Layout from "@/components/Settings/Layout";
 import { useRouter } from "next/navigation";
+import { Link2 } from "lucide-react";
 
 export default function Settings() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function Settings() {
       id: "disable-account",
       title: "Disable Account",
       description: "This will remove your account from Inquiry Bazaar.",
-      icon: <LuTrash2 size={22} />, 
+      icon: <LuTrash2 size={22} />,
       button: "Disable",
       color: "red",
     },
@@ -55,10 +56,10 @@ export default function Settings() {
       color: "purple",
     },
     {
-      id: "language",
-      title: "Language",
-      description: "Choose your preferred application language.",
-      icon: <LuGlobe size={22} />,
+      id: "integration",
+      title: "Integration",
+      description: "Connect Inquiry Bazaar with other applications.",
+      icon: <Link2 size={22} />,
       button: "Select",
       color: "cyan",
     },
