@@ -952,7 +952,7 @@ export default function InquiryLeads({
 
         <Modal.Body>
           {detail && (
-            <div className="max-h-[75vh] overflow-y-auto pr-1">
+            <div className="max-h-[70vh] overflow-y-auto pr-1">
               {/* Header */}
               <div className="rounded-2xl border border-gray-200 bg-gradient-to-r from-[#074977]/5 to-[#D01132]/5 p-5 mb-5">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
