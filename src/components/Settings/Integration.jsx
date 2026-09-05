@@ -1,10 +1,54 @@
-import React from 'react';
-import { ArrowLeft, Globe, Facebook, Webhook, CheckCircle2, XCircle, Link2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, Globe, Facebook, Webhook, CheckCircle2, XCircle, Link2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import axios from 'axios';
 
 export default function Integration({ setLayout, user }) {
-    const isMetaConnected = false;
-    const isWebhookConnected = false;
+    const [loading, setLoading] = useState(true);
+    const [metaIntegration, setMetaIntegration] = useState(null);
+    const [webhookIntegration, setWebhookIntegration] = useState(null);
+    const [isMetaConnected, setIsMetaConnected] = useState(false);
+    const [isWebhookConnected, setIsWebhookConnected] = useState(false);
+
+    useEffect(() => {
+        const checkIntegrations = async () => {
+            try {
+                setLoading(true);
+                const metaResponse = await axios.get("/api/meta/status", { cache: "no-store", });
+                const metaData = metaResponse.data;
+
+                if (metaData?.success && metaData?.integration) {
+                    const integration = metaData.integration;
+                    setMetaIntegration(integration);
+                    setIsMetaConnected(integration.status === "connected");
+                } else {
+                    setMetaIntegration(null);
+                    setIsMetaConnected(false);
+                }
+
+                // const webhookResponse = await axios.get("/api/webhook/status", { cache: "no-store", });
+                // const webhookData = webhookResponse.data;
+                // if (webhookData?.success && webhookData?.integration) {
+                //     const integration = webhookData.integration;
+                //     setWebhookIntegration(integration);
+                //     setIsWebhookConnected(integration.status === "connected");
+                // } else {
+                //     setWebhookIntegration(null);
+                //     setIsWebhookConnected(false);
+                // }
+            } catch (error) {
+                console.error("Failed to check integrations:", error);
+                setMetaIntegration(null);
+                setWebhookIntegration(null);
+                setIsMetaConnected(false);
+                setIsWebhookConnected(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkIntegrations();
+    }, []);
 
     return (
         <div className="bg-white rounded-3xl shadow-md p-6 border border-gray-100 max-w-2xl mx-auto">
@@ -47,24 +91,31 @@ export default function Integration({ setLayout, user }) {
                             <Facebook size={30} className="text-blue-600" />
                         </div>
 
-                        <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${isMetaConnected
-                                ? 'bg-green-50 text-green-700'
-                                : 'bg-gray-100 text-gray-500'
-                                }`}
-                        >
-                            {isMetaConnected ? (
-                                <>
-                                    <CheckCircle2 size={13} />
-                                    Connected
-                                </>
-                            ) : (
-                                <>
-                                    <XCircle size={13} />
-                                    Not Connected
-                                </>
-                            )}
-                        </span>
+                        {loading ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                                <Loader2 size={13} className="animate-spin" />
+                                Checking...
+                            </span>
+                        ) : (
+                            <span
+                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${isMetaConnected
+                                    ? "bg-green-50 text-green-700"
+                                    : "bg-gray-100 text-gray-500"
+                                    }`}
+                            >
+                                {isMetaConnected ? (
+                                    <>
+                                        <CheckCircle2 size={13} />
+                                        Connected
+                                    </>
+                                ) : (
+                                    <>
+                                        <XCircle size={13} />
+                                        Not Connected
+                                    </>
+                                )}
+                            </span>
+                        )}
                     </div>
 
                     <h3 className="text-lg font-bold text-gray-800">
@@ -83,7 +134,7 @@ export default function Integration({ setLayout, user }) {
                             }`}
                     >
                         <Link2 size={16} />
-                        {isMetaConnected ? 'Reconnect' : 'Connect Meta'}
+                        {isMetaConnected ? "Manage Meta" : "Connect Meta"}
                     </Link>
                 </div>
 

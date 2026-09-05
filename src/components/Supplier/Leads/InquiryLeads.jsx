@@ -16,56 +16,19 @@ import {
 import { FaWhatsapp } from 'react-icons/fa';
 import Modal from '@/components/Modal/Modal';
 
-export default function InquiryLeads({ leadsData, search, view, loading, SkeletonCard }) {
-  const [currentPage, setCurrentPage] = useState(1);
+export default function InquiryLeads({
+  leadsData,
+  view,
+  loading,
+  SkeletonCard,
+  currentPage,
+  setCurrentPage,
+  pagination,
+  limit,
+  setLimit,
+}) {
+
   const [detail, setDetails] = useState(false);
-  const itemsPerPage = 9;
-
-  const filteredLeads = useMemo(() => {
-    if (!search?.trim()) return leadsData;
-
-    const q = search.toLowerCase();
-
-    return leadsData.filter((lead) => {
-      const createdDate = lead.createdAt
-        ? new Date(lead.createdAt)
-        : null;
-
-      const searchable = [
-        lead.name,
-        lead.phone,
-        lead.email,
-        lead.platformEmail,
-        lead.product,
-        lead.place,
-        lead.message,
-
-        // Date search
-        createdDate?.toLocaleDateString(), // 20/06/2026
-        createdDate?.toLocaleTimeString(), // 10:30 AM
-        createdDate?.toLocaleString(),     // full date + time
-        createdDate?.toDateString(),       // Sat Jun 20 2026
-        createdDate?.getFullYear(),        // 2026
-      ];
-
-      return searchable
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(q);
-    });
-  }, [leadsData, search]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, leadsData]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredLeads.length / itemsPerPage));
-
-  const paginatedLeads = filteredLeads.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
   return (
     <div>
@@ -106,8 +69,8 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
                     ))}
                   </tr>
                 ))
-              ) : paginatedLeads?.length > 0 ? (
-                paginatedLeads.map((lead, index) => (
+              ) : leadsData?.length > 0 ? (
+                leadsData.map((lead, index) => (
                   <tr
                     key={lead._id}
                     className={`border-t border-gray-100 hover:bg-blue-50/40 transition ${index % 2 === 0
@@ -315,8 +278,8 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
               <SkeletonCard />
               <SkeletonCard />
             </>
-          ) : paginatedLeads?.length > 0 ? (
-            paginatedLeads.map((lead, index) => (
+          ) : leadsData?.length > 0 ? (
+            leadsData.map((lead, index) => (
               <motion.div key={index}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -544,49 +507,140 @@ export default function InquiryLeads({ leadsData, search, view, loading, Skeleto
           )}
         </div>}
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-4 border-t border-gray-200 bg-white">
-        <p className="text-sm text-gray-500">
-          Showing{" "}
-          <span className="font-medium">
-            {(currentPage - 1) * itemsPerPage + 1}
-          </span>
-          {" "}to{" "}
-          <span className="font-medium">
-            {Math.min(currentPage * itemsPerPage, filteredLeads.length)}
-          </span>
-          {" "}of{" "}
-          <span className="font-medium">
-            {filteredLeads.length}
-          </span>
-          {" "}Inquiry
-        </p>
+      {/* PAGINATION */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 px-5 py-4 border-t border-gray-200 bg-white">
 
-        <div className="flex items-center gap-2">
-          <button onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
-          >
-            Previous
-          </button>
+        {/* LEFT */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
 
-          {[...Array(totalPages)].map((_, index) => (
-            <button key={index} onClick={() => setCurrentPage(index + 1)}
-              className={`w-10 h-10 rounded-lg font-medium transition ${currentPage === index + 1
-                ? "bg-blue-600 text-white"
-                : "border border-gray-300 hover:bg-gray-100"
-                }`}
+          {/* SHOWING */}
+          <p className="text-sm text-gray-500 whitespace-nowrap">
+            {pagination?.total > 0 ? (
+              <>
+                Showing{" "}
+                <span className="font-semibold text-gray-700">
+                  {(currentPage - 1) * limit + 1}
+                </span>
+                {" "}to{" "}
+                <span className="font-semibold text-gray-700">
+                  {Math.min(
+                    currentPage * limit,
+                    pagination.total
+                  )}
+                </span>
+                {" "}of{" "}
+                <span className="font-semibold text-gray-700">
+                  {pagination.total}
+                </span>
+                {" "}Inquiry
+              </>
+            ) : (
+              "No Inquiry"
+            )}
+          </p>
+
+          {/* ITEMS PER PAGE */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500 whitespace-nowrap">
+              Show
+            </span>
+
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              disabled={loading}
+              className="px-3 py-2 min-w-[75px] border border-gray-300 rounded-lg bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {index + 1}
-            </button>
-          ))}
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={75}>75</option>
+              <option value={100}>100</option>
+            </select>
 
-          <button onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-3 py-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
-          >
-            Next
-          </button>
+            <span className="text-sm text-gray-500 whitespace-nowrap">
+              per page
+            </span>
+          </div>
         </div>
+
+        {/* RIGHT - PAGINATION */}
+        {pagination?.totalPages > 1 && (
+          <div className="flex items-center gap-2">
+
+            {/* PREVIOUS */}
+            <button
+              type="button"
+              onClick={() => {
+                if (pagination.hasPrevPage && !loading) {
+                  setCurrentPage((page) => page - 1);
+                }
+              }}
+              disabled={
+                !pagination.hasPrevPage ||
+                loading
+              }
+              className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              Previous
+            </button>
+
+            {/* PAGE NUMBERS */}
+            <div className="flex items-center gap-1 overflow-x-auto max-w-[400px]">
+              {Array.from(
+                {
+                  length: pagination.totalPages,
+                },
+                (_, index) => index + 1
+              ).map((page) => (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() => {
+                    if (!loading) {
+                      setCurrentPage(page);
+                    }
+                  }}
+                  disabled={loading}
+                  className={`
+                            min-w-10 h-10 px-3 rounded-lg
+                            text-sm font-medium
+                            transition
+                            disabled:cursor-not-allowed
+                            ${currentPage === page
+                      ? "bg-blue-600 text-white"
+                      : "border border-gray-300 text-gray-700 hover:bg-gray-100"
+                    }
+                        `}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+
+            {/* NEXT */}
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  pagination.hasNextPage &&
+                  !loading
+                ) {
+                  setCurrentPage((page) => page + 1);
+                }
+              }}
+              disabled={
+                !pagination.hasNextPage ||
+                loading
+              }
+              className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       <Modal open={detail} onClose={() => setDetails(false)}>
