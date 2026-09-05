@@ -77,109 +77,30 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-
-    console.log(
-        "\n========================================"
-    );
-
-    console.log(
-        "🔥 META WEBHOOK POST HIT"
-    );
-
-    console.log(
-        "========================================\n"
-    );
+    console.log("🔥 META WEBHOOK POST HIT");
 
     try {
-
-        // =================================================
-        // 1. READ WEBHOOK BODY
-        // =================================================
-
-        const body =
-            await request.json();
-
-        console.log(
-            "📩 META WEBHOOK BODY:",
-            JSON.stringify(
-                body,
-                null,
-                2
-            )
-        );
-
-
-        // =================================================
-        // 2. CHECK OBJECT
-        // =================================================
-
-        if (
-            body?.object !== "page"
-        ) {
-
-            console.log(
-                "META EVENT IGNORED:",
-                body?.object
-            );
-
-            return NextResponse.json(
-                {
-                    success: true,
-                },
-                {
-                    status: 200,
-                }
-            );
+        const body = await request.json();
+        console.log("📩 META WEBHOOK BODY:", JSON.stringify(body, null, 2));
+        if (body?.object !== "page") {
+            console.log("META EVENT IGNORED:", body?.object);
+            return NextResponse.json({ success: true, }, { status: 200, });
         }
-
-
-        // =================================================
-        // 3. CONNECT DATABASE
-        // =================================================
 
         await connectDB();
 
-        console.log(
-            "✅ DATABASE CONNECTED"
-        );
-
-
-        // =================================================
-        // 4. LOOP THROUGH ENTRIES
-        // =================================================
-
-        for (
-            const entry of
-            body.entry || []
-        ) {
+        for (const entry of body.entry || []) {
 
             // Meta Page ID
-            const pageId =
-                String(entry?.id || "");
-
-            console.log(
-                "📄 META PAGE ID:",
-                pageId
-            );
+            const pageId = String(entry?.id || "");
+            console.log("📄 META PAGE ID:", pageId);
 
             if (!pageId) {
-
-                console.error(
-                    "❌ META PAGE ID MISSING"
-                );
-
+                console.error("❌ META PAGE ID MISSING");
                 continue;
             }
 
-
-            // =================================================
-            // 5. LOOP THROUGH CHANGES
-            // =================================================
-
-            for (
-                const change of
-                entry.changes || []
-            ) {
+            for (const change of entry.changes || []) {
 
                 console.log(
                     "META CHANGE:",
@@ -546,25 +467,14 @@ export async function POST(request) {
                 // 18. PRODUCT
                 // =================================================
 
-                const product =
-                    fields.product ||
-                    fields.product_name ||
-                    fields.interested_product ||
-                    fields.product_interest ||
-                    null;
+                const product = fields["what_products_are_you_interested_in?"] || fields.what_products_are_you_interested_in || fields.product || fields.product_name || fields.interested_product || fields.product_interest || null;
 
 
                 // =================================================
                 // 19. MESSAGE / REQUIREMENT
                 // =================================================
 
-                const message =
-                    fields.message ||
-                    fields.requirement ||
-                    fields.query ||
-                    fields.details ||
-                    fields.comments ||
-                    null;
+                const message = fields.message || fields.requirement || fields.query || fields.details || fields.comments || fields["what_products_are_you_interested_in?"] || fields.what_products_are_you_interested_in || null;
 
 
                 // =================================================

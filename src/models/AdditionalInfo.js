@@ -22,9 +22,29 @@ const additionalInfoSchema = new mongoose.Schema(
       type: String,
       uppercase: true,
     },
+
+    webhookApiKeyHash: {
+      type: String,
+      default: null,
+    },
+
+    webhookApiKeyPrefix: {
+      type: String,
+      default: null,
+    },
+
+    webhookApiStatus: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+
+    webhookLastUsedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.models.AdditionalInfo ||
-  mongoose.model("AdditionalInfo", additionalInfoSchema);
+export default mongoose.models.AdditionalInfo || mongoose.model("AdditionalInfo", additionalInfoSchema);
