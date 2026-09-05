@@ -1,17 +1,10 @@
 
 import { NextResponse } from "next/server";
-
 import Integration from "@/models/IntegrationSchema";
 import Lead from "@/models/Leads";
 import { connectDB } from "@/config/db";
 import { metaGet } from "@/utils/meta/graph";
-
 export const runtime = "nodejs";
-
-
-// =====================================================
-// META WEBHOOK VERIFICATION
-// =====================================================
 
 export async function GET(request) {
     try {
@@ -30,12 +23,19 @@ export async function GET(request) {
         const verifyToken =
             process.env.META_WEBHOOK_VERIFY_TOKEN;
 
+        console.log("META WEBHOOK VERIFY:", {
+            mode,
+            hasToken: !!token,
+            hasChallenge: !!challenge,
+            tokenMatches: token === verifyToken,
+        });
+
         if (
             mode === "subscribe" &&
             token === verifyToken
         ) {
             console.log(
-                "META WEBHOOK VERIFIED"
+                "✅ META WEBHOOK VERIFIED"
             );
 
             return new Response(
@@ -51,7 +51,7 @@ export async function GET(request) {
         }
 
         console.error(
-            "META WEBHOOK VERIFICATION FAILED"
+            "❌ META WEBHOOK VERIFICATION FAILED"
         );
 
         return new Response(
@@ -62,9 +62,8 @@ export async function GET(request) {
         );
 
     } catch (error) {
-
         console.error(
-            "META WEBHOOK VERIFICATION ERROR:",
+            "🔥 META WEBHOOK VERIFICATION ERROR:",
             error
         );
 
@@ -77,28 +76,31 @@ export async function GET(request) {
     }
 }
 
-
-// =====================================================
-// META LEAD WEBHOOK
-// =====================================================
-
 export async function POST(request) {
 
     console.log(
-        "🔥🔥🔥 META WEBHOOK POST HIT 🔥🔥🔥"
+        "\n========================================"
+    );
+
+    console.log(
+        "🔥 META WEBHOOK POST HIT"
+    );
+
+    console.log(
+        "========================================\n"
     );
 
     try {
 
         // =================================================
-        // READ META WEBHOOK BODY
+        // 1. READ WEBHOOK BODY
         // =================================================
 
         const body =
             await request.json();
 
         console.log(
-            "META WEBHOOK:",
+            "📩 META WEBHOOK BODY:",
             JSON.stringify(
                 body,
                 null,
@@ -108,16 +110,16 @@ export async function POST(request) {
 
 
         // =================================================
-        // CHECK META OBJECT
+        // 2. CHECK OBJECT
         // =================================================
 
         if (
-            body.object !== "page"
+            body?.object !== "page"
         ) {
 
             console.log(
                 "META EVENT IGNORED:",
-                body.object
+                body?.object
             );
 
             return NextResponse.json(
@@ -132,14 +134,18 @@ export async function POST(request) {
 
 
         // =================================================
-        // CONNECT DATABASE
+        // 3. CONNECT DATABASE
         // =================================================
 
         await connectDB();
 
+        console.log(
+            "✅ DATABASE CONNECTED"
+        );
+
 
         // =================================================
-        // LOOP THROUGH META ENTRIES
+        // 4. LOOP THROUGH ENTRIES
         // =================================================
 
         for (
@@ -147,26 +153,19 @@ export async function POST(request) {
             body.entry || []
         ) {
 
-            /*
-             * Meta Page ID comes from:
-             *
-             * entry.id
-             */
-
+            // Meta Page ID
             const pageId =
-                String(entry.id || "");
-
+                String(entry?.id || "");
 
             console.log(
-                "META PAGE ID:",
+                "📄 META PAGE ID:",
                 pageId
             );
-
 
             if (!pageId) {
 
                 console.error(
-                    "META PAGE ID MISSING"
+                    "❌ META PAGE ID MISSING"
                 );
 
                 continue;
@@ -174,7 +173,7 @@ export async function POST(request) {
 
 
             // =================================================
-            // LOOP THROUGH CHANGES
+            // 5. LOOP THROUGH CHANGES
             // =================================================
 
             for (
@@ -182,47 +181,79 @@ export async function POST(request) {
                 entry.changes || []
             ) {
 
-                /*
-                 * We only process leadgen events.
-                 */
+                console.log(
+                    "META CHANGE:",
+                    JSON.stringify(
+                        change,
+                        null,
+                        2
+                    )
+                );
 
+
+                // We only process leadgen
                 if (
-                    change.field !== "leadgen"
+                    change?.field !==
+                    "leadgen"
                 ) {
+
+                    console.log(
+                        "Ignoring field:",
+                        change?.field
+                    );
 
                     continue;
                 }
 
 
                 const value =
-                    change.value || {};
+                    change?.value || {};
 
 
                 // =================================================
-                // META LEAD INFORMATION
+                // 6. GET META LEAD DATA
                 // =================================================
 
                 const metaLeadId =
-                    value.leadgen_id;
+                    value.leadgen_id
+                        ? String(
+                            value.leadgen_id
+                        )
+                        : null;
 
                 const formId =
-                    value.form_id || null;
+                    value.form_id
+                        ? String(
+                            value.form_id
+                        )
+                        : null;
 
                 const adId =
-                    value.ad_id || null;
+                    value.ad_id
+                        ? String(
+                            value.ad_id
+                        )
+                        : null;
 
                 const adsetId =
                     value.adset_id ||
-                    value.adgroup_id ||
-                    null;
+                        value.adgroup_id
+                        ? String(
+                            value.adset_id ||
+                            value.adgroup_id
+                        )
+                        : null;
 
                 const campaignId =
-                    value.campaign_id ||
-                    null;
+                    value.campaign_id
+                        ? String(
+                            value.campaign_id
+                        )
+                        : null;
 
 
                 console.log(
-                    "NEW META LEAD EVENT:",
+                    "🆕 NEW META LEAD EVENT:",
                     {
                         metaLeadId,
                         pageId,
@@ -235,13 +266,13 @@ export async function POST(request) {
 
 
                 // =================================================
-                // VALIDATE LEAD ID
+                // 7. VALIDATE LEAD ID
                 // =================================================
 
                 if (!metaLeadId) {
 
                     console.error(
-                        "No leadgen_id found"
+                        "❌ leadgen_id missing"
                     );
 
                     continue;
@@ -249,8 +280,18 @@ export async function POST(request) {
 
 
                 // =================================================
-                // FIND COMPANY INTEGRATION
+                // 8. FIND META INTEGRATION
                 // =================================================
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * Your Integration schema uses:
+                 *
+                 * userId
+                 *
+                 * NOT companyId.
+                 */
 
                 const integration =
                     await Integration.findOne({
@@ -266,7 +307,11 @@ export async function POST(request) {
                 if (!integration) {
 
                     console.error(
-                        "No Meta integration found for Page:",
+                        "❌ NO META INTEGRATION FOUND"
+                    );
+
+                    console.error(
+                        "Page ID:",
                         pageId
                     );
 
@@ -275,23 +320,23 @@ export async function POST(request) {
 
 
                 console.log(
-                    "META INTEGRATION FOUND:",
+                    "✅ META INTEGRATION FOUND:",
                     integration._id
                 );
 
 
                 // =================================================
-                // GET COMPANY ID
+                // 9. GET USER ID
                 // =================================================
 
-                const companyId =
-                    integration.companyId;
+                const userId =
+                    integration.userId;
 
 
-                if (!companyId) {
+                if (!userId) {
 
                     console.error(
-                        "Company ID missing from Meta integration:",
+                        "❌ USER ID MISSING FROM META INTEGRATION:",
                         integration._id
                     );
 
@@ -299,18 +344,22 @@ export async function POST(request) {
                 }
 
 
+                console.log(
+                    "META INTEGRATION USER:",
+                    userId
+                );
+
+
                 // =================================================
-                // GET PAGE ACCESS TOKEN
+                // 10. GET PAGE ACCESS TOKEN
                 // =================================================
 
                 /*
-                 * IMPORTANT
-                 *
-                 * Your working CRM stores:
+                 * Your select-page API saves:
                  *
                  * metadata.pageAccessToken
                  *
-                 * So use the same here.
+                 * Therefore the webhook uses that token.
                  */
 
                 const pageAccessToken =
@@ -322,29 +371,59 @@ export async function POST(request) {
                 if (!pageAccessToken) {
 
                     console.error(
-                        "Page access token missing for Page:",
-                        pageId
+                        "❌ PAGE ACCESS TOKEN MISSING"
+                    );
+
+                    console.error(
+                        "Integration:",
+                        integration._id
+                    );
+
+                    console.error(
+                        "Metadata:",
+                        {
+                            pageId:
+                                integration.metadata
+                                    ?.pageId,
+
+                            pageName:
+                                integration.metadata
+                                    ?.pageName,
+
+                            leadgenSubscribed:
+                                integration.metadata
+                                    ?.leadgenSubscribed,
+
+                            hasPageAccessToken:
+                                !!integration.metadata
+                                    ?.pageAccessToken,
+                        }
                     );
 
                     continue;
                 }
 
 
+                console.log(
+                    "✅ PAGE ACCESS TOKEN FOUND"
+                );
+
+
                 // =================================================
-                // DUPLICATE CHECK
+                // 11. DUPLICATE CHECK
                 // =================================================
 
                 const existingLead =
                     await Lead.findOne({
                         metaLeadId:
-                            String(metaLeadId),
+                            metaLeadId,
                     });
 
 
                 if (existingLead) {
 
                     console.log(
-                        "Meta lead already exists:",
+                        "⚠️ META LEAD ALREADY EXISTS:",
                         metaLeadId
                     );
 
@@ -353,11 +432,11 @@ export async function POST(request) {
 
 
                 // =================================================
-                // GET ACTUAL LEAD FROM META
+                // 12. FETCH ACTUAL LEAD FROM META
                 // =================================================
 
                 console.log(
-                    "FETCHING META LEAD:",
+                    "🔄 FETCHING LEAD FROM META:",
                     metaLeadId
                 );
 
@@ -367,14 +446,14 @@ export async function POST(request) {
                         `/${metaLeadId}`,
                         {
                             fields:
-                                "id,created_time,field_data,campaign_id,campaign_name,ad_id,ad_name,adset_id,adset_name,is_organic,platform,form_id",
+                                "id,created_time,field_data,form_id,ad_id,ad_name,adset_id,adset_name,campaign_id,campaign_name,is_organic,platform",
                         },
                         pageAccessToken
                     );
 
 
                 console.log(
-                    "META LEAD DATA:",
+                    "✅ META LEAD FETCHED:",
                     JSON.stringify(
                         metaLead,
                         null,
@@ -384,7 +463,7 @@ export async function POST(request) {
 
 
                 // =================================================
-                // NORMALIZE FIELD DATA
+                // 13. NORMALIZE FIELD DATA
                 // =================================================
 
                 const fields = {};
@@ -392,13 +471,14 @@ export async function POST(request) {
 
                 for (
                     const field of
-                    metaLead.field_data || []
+                    metaLead?.field_data || []
                 ) {
 
-                    if (!field?.name) {
+                    if (
+                        !field?.name
+                    ) {
                         continue;
                     }
-
 
                     fields[field.name] =
                         field.values?.[0] ??
@@ -407,13 +487,13 @@ export async function POST(request) {
 
 
                 console.log(
-                    "NORMALIZED META FIELDS:",
+                    "📋 NORMALIZED FIELDS:",
                     fields
                 );
 
 
                 // =================================================
-                // MAP LEAD NAME
+                // 14. NAME
                 // =================================================
 
                 const name =
@@ -424,24 +504,26 @@ export async function POST(request) {
                         fields.last_name,
                     ]
                         .filter(Boolean)
-                        .join(" ") ||
+                        .join(" ")
+                        .trim() ||
                     "Facebook Lead";
 
 
                 // =================================================
-                // MAP PHONE
+                // 15. PHONE
                 // =================================================
 
                 const phone =
                     fields.phone_number ||
                     fields.phone ||
                     fields.mobile ||
+                    fields.mobile_number ||
                     fields.whatsapp_number ||
                     null;
 
 
                 // =================================================
-                // MAP EMAIL
+                // 16. EMAIL
                 // =================================================
 
                 const email =
@@ -451,7 +533,7 @@ export async function POST(request) {
 
 
                 // =================================================
-                // MAP COMPANY
+                // 17. COMPANY
                 // =================================================
 
                 const companyName =
@@ -461,7 +543,7 @@ export async function POST(request) {
 
 
                 // =================================================
-                // MAP PRODUCT
+                // 18. PRODUCT
                 // =================================================
 
                 const product =
@@ -473,7 +555,7 @@ export async function POST(request) {
 
 
                 // =================================================
-                // MAP MESSAGE
+                // 19. MESSAGE / REQUIREMENT
                 // =================================================
 
                 const message =
@@ -486,7 +568,7 @@ export async function POST(request) {
 
 
                 // =================================================
-                // MAP LOCATION
+                // 20. LOCATION
                 // =================================================
 
                 const place =
@@ -497,7 +579,7 @@ export async function POST(request) {
 
 
                 // =================================================
-                // MAP GST
+                // 21. GST
                 // =================================================
 
                 const gstNumber =
@@ -508,37 +590,47 @@ export async function POST(request) {
 
 
                 // =================================================
-                // CAMPAIGN INFORMATION
+                // 22. CAMPAIGN DATA
                 // =================================================
 
                 const finalCampaignId =
                     campaignId ||
-                    metaLead.campaign_id ||
+                    metaLead?.campaign_id ||
                     null;
-
 
                 const finalCampaignName =
-                    metaLead.campaign_name ||
+                    metaLead?.campaign_name ||
                     null;
 
 
                 // =================================================
-                // CREATE CRM LEAD
+                // 23. CREATE CRM LEAD
                 // =================================================
+
+                console.log(
+                    "💾 CREATING CRM LEAD..."
+                );
+
 
                 const lead =
                     await Lead.create({
 
                         /*
-                         * NEW CRM USES companyId
+                         * IMPORTANT:
+                         *
+                         * Your current Integration
+                         * schema is userId based.
+                         *
+                         * Therefore use userId here.
                          */
-                        companyId,
+
+                        userId,
 
                         source:
                             "facebook",
 
                         metaLeadId:
-                            String(metaLeadId),
+                            metaLeadId,
 
                         name,
 
@@ -590,7 +682,7 @@ export async function POST(request) {
 
 
                 // =================================================
-                // UPDATE META INTEGRATION
+                // 24. UPDATE INTEGRATION SYNC
                 // =================================================
 
                 await Integration.updateOne(
@@ -611,15 +703,20 @@ export async function POST(request) {
 
 
                 console.log(
-                    "META INTEGRATION LAST SYNC UPDATED"
+                    "✅ META INTEGRATION SYNC UPDATED"
                 );
             }
         }
 
 
         // =================================================
-        // META WEBHOOK ACKNOWLEDGEMENT
+        // 25. ACKNOWLEDGE META
         // =================================================
+
+        console.log(
+            "\n✅ META WEBHOOK PROCESSED\n"
+        );
+
 
         return NextResponse.json(
             {
@@ -633,17 +730,27 @@ export async function POST(request) {
     } catch (error) {
 
         console.error(
-            "🔥 META LEAD WEBHOOK ERROR:",
+            "\n🔥🔥 META LEAD WEBHOOK ERROR 🔥🔥"
+        );
+
+        console.error(
             error
         );
 
+        console.error(
+            "Message:",
+            error?.message
+        );
+
+        console.error(
+            "Stack:",
+            error?.stack
+        );
+
+
         /*
-         * Meta should receive 200 so that
-         * it doesn't continuously retry
-         * the same webhook event.
-         *
-         * Actual error is available
-         * in server logs.
+         * Return 200 so Meta does not keep
+         * retrying the same webhook.
          */
 
         return NextResponse.json(

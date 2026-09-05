@@ -1,3 +1,4 @@
+
 import { NextResponse } from "next/server";
 import Integration from "@/models/IntegrationSchema";
 import { connectDB } from "@/config/db";
@@ -8,9 +9,28 @@ export const runtime = "nodejs";
 
 export async function POST(request) {
     try {
+        // ------------------------------------------------
+        // 1. Get logged-in seller/user ID
+        // ------------------------------------------------
+
         const sellerId = getSellerIdFromRequest(request);
 
+        if (!sellerId) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Unauthorized",
+                },
+                { status: 401 }
+            );
+        }
+
+        // ------------------------------------------------
+        // 2. Get selected Facebook Page ID
+        // ------------------------------------------------
+
         const body = await request.json();
+
         const pageId = body.pageId;
 
         if (!pageId) {
@@ -26,15 +46,11 @@ export async function POST(request) {
         await connectDB();
 
         // ------------------------------------------------
-        // 1. Find Meta integration
+        // 3. Find Meta integration for this user
         // ------------------------------------------------
 
         const integration = await Integration.findOne({
-            // IMPORTANT:
-            // If getSellerIdFromRequest returns companyId,
-            // use companyId here.
-            companyId: sellerId,
-
+            userId: sellerId,
             provider: "meta",
         });
 
@@ -49,7 +65,7 @@ export async function POST(request) {
         }
 
         // ------------------------------------------------
-        // 2. Get Meta USER access token
+        // 4. Get META USER access token
         // ------------------------------------------------
 
         const userAccessToken =
@@ -62,7 +78,7 @@ export async function POST(request) {
         }
 
         // ------------------------------------------------
-        // 3. Get Facebook Pages
+        // 5. Get Facebook Pages
         // ------------------------------------------------
 
         const pages = await metaGet(
@@ -73,6 +89,19 @@ export async function POST(request) {
             },
             userAccessToken
         );
+
+        console.log(
+            "Facebook pages:",
+            pages?.data?.map((page) => ({
+                id: page.id,
+                name: page.name,
+                hasAccessToken: !!page.access_token,
+            }))
+        );
+
+        // ------------------------------------------------
+        // 6. Find selected Page
+        // ------------------------------------------------
 
         const page = (pages.data || []).find(
             (item) =>
@@ -91,7 +120,7 @@ export async function POST(request) {
         }
 
         // ------------------------------------------------
-        // 4. Get PAGE access token
+        // 7. Get PAGE access token
         // ------------------------------------------------
 
         const pageAccessToken =
@@ -99,7 +128,7 @@ export async function POST(request) {
 
         if (!pageAccessToken) {
             throw new Error(
-                "Page access token not received"
+                "Facebook Page access token not received"
             );
         }
 
@@ -114,7 +143,7 @@ export async function POST(request) {
         );
 
         // ------------------------------------------------
-        // 5. Subscribe Page to leadgen webhook
+        // 8. Subscribe Page to leadgen webhook
         // ------------------------------------------------
 
         const subscription = await metaPost(
@@ -131,21 +160,19 @@ export async function POST(request) {
         );
 
         // ------------------------------------------------
-        // 6. Save selected Page
+        // 9. Save selected Page
         // ------------------------------------------------
 
-        integration.companyId = sellerId;
-
-        integration.provider = "meta";
-
         /*
-         * IMPORTANT:
+         * VERY IMPORTANT
          *
-         * Keep credentials.accessToken as the
-         * META USER ACCESS TOKEN.
+         * credentials.accessToken
+         * = META USER ACCESS TOKEN
          *
-         * Do NOT replace it with pageAccessToken.
+         * metadata.pageAccessToken
+         * = FACEBOOK PAGE ACCESS TOKEN
          */
+
         integration.credentials.accessToken =
             userAccessToken;
 
@@ -156,14 +183,13 @@ export async function POST(request) {
 
             pageName: page.name,
 
-            // THIS IS THE IMPORTANT FIX
             pageAccessToken: pageAccessToken,
 
             leadgenSubscribed: true,
 
-            selectedAt: new Date(),
-
             oauthConnected: true,
+
+            selectedAt: new Date(),
         };
 
         integration.status = "connected";
@@ -176,8 +202,21 @@ export async function POST(request) {
 
         await integration.save();
 
+        console.log(
+            "Meta integration updated:",
+            {
+                userId: integration.userId,
+                pageId: integration.metadata.pageId,
+                pageName: integration.metadata.pageName,
+                hasPageAccessToken:
+                    !!integration.metadata.pageAccessToken,
+                leadgenSubscribed:
+                    integration.metadata.leadgenSubscribed,
+            }
+        );
+
         // ------------------------------------------------
-        // 7. Response
+        // 10. Return success
         // ------------------------------------------------
 
         return NextResponse.json({
