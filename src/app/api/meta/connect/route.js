@@ -6,49 +6,100 @@ export const runtime = "nodejs";
 
 export async function GET(request) {
     try {
-        const sellerId = getSellerIdFromRequest(request);
+        const sellerId =
+            getSellerIdFromRequest(request);
 
-        const appId = process.env.META_APP_ID;
-        const configId = process.env.META_CONFIG_ID;
-        const redirectUri = process.env.META_REDIRECT_URI;
+        const appId =
+            process.env.META_APP_ID;
 
-        if (!appId || !configId || !redirectUri) {
-            throw new Error("Meta configuration is missing");
+        const configId =
+            process.env.META_CONFIG_ID;
+
+        const redirectUri =
+            process.env.META_REDIRECT_URI;
+
+        const stateSecret =
+            process.env.META_OAUTH_STATE_SECRET;
+
+        if (
+            !appId ||
+            !configId ||
+            !redirectUri ||
+            !stateSecret
+        ) {
+            throw new Error(
+                "Meta configuration is missing"
+            );
         }
 
-        const state = jwt.sign(
-            { userId: String(sellerId) },
-            process.env.META_OAUTH_STATE_SECRET,
-            { expiresIn: "10m" }
-        );
+        const state =
+            jwt.sign(
+                {
+                    userId:
+                        String(sellerId),
+                },
+                stateSecret,
+                {
+                    expiresIn:
+                        "10m",
+                }
+            );
 
-        const params = new URLSearchParams({
-            client_id: appId,
-            redirect_uri: redirectUri,
-            config_id: configId,
-            response_type: "code",
-            state,
-        });
+        const params =
+            new URLSearchParams({
+                client_id:
+                    appId,
+
+                redirect_uri:
+                    redirectUri,
+
+                config_id:
+                    configId,
+
+                response_type:
+                    "code",
+
+                state,
+            });
+
+        const graphVersion =
+            process.env
+                .META_GRAPH_API_VERSION ||
+            "v23.0";
 
         const metaUrl =
-            `https://www.facebook.com/v23.0/dialog/oauth?${params.toString()}`;
+            `https://www.facebook.com/${graphVersion}/dialog/oauth?${params.toString()}`;
 
-        console.log("META CONNECT", {
-            redirectUri,
-            configId,
-            metaUrl,
-        });
+        console.log(
+            "META CONNECT:",
+            {
+                appId,
+                configId,
+                redirectUri,
+                graphVersion,
+                metaUrl,
+            }
+        );
 
-        return NextResponse.redirect(metaUrl);
+        return NextResponse.redirect(
+            metaUrl
+        );
+
     } catch (error) {
-        console.error("Meta connect error:", error);
+        console.error(
+            "Meta connect error:",
+            error
+        );
 
         return NextResponse.json(
             {
                 success: false,
-                message: error.message,
+                message:
+                    error.message,
             },
-            { status: 401 }
+            {
+                status: 401,
+            }
         );
     }
 }
