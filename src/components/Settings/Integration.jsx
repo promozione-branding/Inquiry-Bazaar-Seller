@@ -29,13 +29,9 @@ export default function Integration({ setLayout }) {
             try {
                 setLoading(true);
 
-                // ==========================================
-                // META STATUS
-                // ==========================================
+
                 try {
-                    const response = await axios.get(
-                        "/api/meta/status"
-                    );
+                    const response = await axios.get("/api/meta/status");
 
                     const data = response.data;
 
@@ -52,16 +48,12 @@ export default function Integration({ setLayout }) {
                     setIsMetaConnected(false);
                 }
 
-                // ==========================================
-                // WEBHOOK STATUS
-                // ==========================================
+
                 try {
-                    const response = await axios.get(
-                        "/api/webhook"
-                    );
+                    const response = await axios.get("/api/webhook");
 
                     const data = response.data;
-
+// console.log(data);
                     setIsWebhookConnected(
                         data?.success &&
                         data?.webhook?.status === "active"
@@ -75,13 +67,9 @@ export default function Integration({ setLayout }) {
                     setIsWebhookConnected(false);
                 }
 
-                // ==========================================
-                // WEBSITE STATUS
-                // ==========================================
+
                 try {
-                    const response = await axios.get(
-                        "/api/website/status"
-                    );
+                    const response = await axios.get("/api/website/status");
 
                     const data = response.data;
 
@@ -133,8 +121,8 @@ export default function Integration({ setLayout }) {
         return (
             <span
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${connected
-                        ? "bg-green-50 text-green-700"
-                        : "bg-gray-100 text-gray-500"
+                    ? "bg-green-50 text-green-700"
+                    : "bg-gray-100 text-gray-500"
                     }`}
             >
                 {connected ? (
@@ -330,11 +318,11 @@ export default function Integration({ setLayout }) {
                     </div>
 
                     <h3 className="text-lg font-bold text-gray-800">
-                        BrandBnalo Website
+                         Website
                     </h3>
 
                     <p className="text-sm text-gray-500 mt-1 min-h-[40px]">
-                        Connect your BrandBnalo website to
+                        Connect your website to
                         receive leads directly in your CRM.
                     </p>
 

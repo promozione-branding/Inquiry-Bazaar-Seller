@@ -38,7 +38,7 @@ export async function GET(request) {
 
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
         const webhookUrl = `${baseUrl}/api/webhook`;
-
+        console.log(additionalInfo)
         return NextResponse.json({
             success: true,
             webhook: {

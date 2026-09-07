@@ -36,7 +36,7 @@ const additionalInfoSchema = new mongoose.Schema(
     webhookApiStatus: {
       type: String,
       enum: ["active", "inactive"],
-      default: "active",
+      default: "inactive",
     },
 
     webhookLastUsedAt: {
