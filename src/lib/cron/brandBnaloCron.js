@@ -9,14 +9,14 @@ let isRunning = false;
 export function startBrandBnaloSyncCron() {
     console.log("🚀 BrandBnalo lead sync cron started");
 
+    if (isRunning) {
+        console.log("⏳ Previous BrandBnalo sync is still running");
+        return;
+    }
+    
+    isRunning = true;
+
     cron.schedule("* * * * *", async () => {
-        if (isRunning) {
-            console.log("⏳ Previous BrandBnalo sync is still running");
-            return;
-        }
-
-        isRunning = true;
-
         try {
             await connectDB();
             const integrations = await Integration.find({ provider: "website", status: "connected", })
