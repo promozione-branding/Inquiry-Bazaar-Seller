@@ -664,7 +664,7 @@ export default function Leads() {
                             <div className="relative w-full overflow-hidden sm:w-60">
                                 <Search
                                     size={16}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                    className="absolute sm:flex hidden left-3 top-1/2 -translate-y-1/2 text-gray-400"
                                 />
 
                                 <input
@@ -674,7 +674,7 @@ export default function Leads() {
                                         setSearch(e.target.value)
                                     }
                                     placeholder="Search leads..."
-                                    className="input text-xs sm:text-base pl-9! w-full px-2 py-2"
+                                    className="input text-base sm:pl-9! w-full px-2 py-2"
                                 />
                             </div>
                         </div>

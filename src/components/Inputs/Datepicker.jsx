@@ -46,7 +46,7 @@ export default function MyDateRangePicker({
   };
 
   return (
-    <div ref={wrapperRef} className="relative inline-block">
+    <div ref={wrapperRef} className="relative inline-block w-full sm:w-auto">
       <input
         type="text"
         readOnly
@@ -54,13 +54,22 @@ export default function MyDateRangePicker({
         value={
           value?.startDate && value?.endDate
             ? `${format(value.startDate, "dd MMM yyyy")} - ${format(
-                value.endDate,
-                "dd MMM yyyy"
-              )}`
+              value.endDate,
+              "dd MMM yyyy"
+            )}`
             : ""
         }
         placeholder="Select date range"
-        className="border border-gray-300 rounded-md px-2 py-2 text-xs sm:text-base bg-white cursor-pointer w-fit"
+        className="
+          border border-gray-300
+          rounded-md
+          px-2 py-2
+          text-base
+          bg-white
+          cursor-pointer
+          w-full sm:w-auto
+          outline-none
+        "
       />
 
       {open && (

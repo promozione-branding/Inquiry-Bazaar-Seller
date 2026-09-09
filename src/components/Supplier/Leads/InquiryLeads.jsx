@@ -838,50 +838,47 @@ export default function InquiryLeads({
 
         <Modal.Body>
           {detail && (
-            <div className="max-h-[70vh] overflow-y-auto pr-1">
+            <div className="max-h-[70vh] overflow-y-auto px-0.5 sm:pr-1">
               {/* Header */}
-              <div className="rounded-2xl border border-gray-200 bg-gradient-to-r from-[#074977]/5 to-[#D01132]/5 p-5 mb-5">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-center gap-4">
+              <div className="rounded-xl sm:rounded-2xl border border-gray-200 bg-gradient-to-r from-[#074977]/5 to-[#D01132]/5 p-3 sm:p-5 mb-3 sm:mb-5">
+                <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-3">
+                  {/* User */}
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className="relative shrink-0">
-                      <div className="w-14 h-14 rounded-2xl bg-[#074977]/10 border border-[#074977]/10 flex items-center justify-center">
+                      <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#074977]/10 border border-[#074977]/10 flex items-center justify-center">
                         <User
-                          size={25}
-                          className="text-[#074977]"
+                          size={21}
+                          className="sm:w-[25px] sm:h-[25px] text-[#074977]"
                         />
                       </div>
 
-                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-white bg-green-500" />
+                      <span className="absolute -top-1 -right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-white bg-green-500" />
                     </div>
 
                     <div className="min-w-0">
-                      <h2 className="text-xl font-bold text-gray-800">
+                      <h2 className="text-base sm:text-xl font-bold text-gray-800 truncate">
                         {detail.name || "-"}
                       </h2>
 
-                      <div className="flex flex-wrap items-center gap-2 mt-1">
-                        <span className="text-sm text-gray-500">
-                          {getSourceLabel(
-                            detail.source
-                          )}
+                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        <span className="text-xs sm:text-sm text-gray-500 truncate max-w-[120px] sm:max-w-none">
+                          {getSourceLabel(detail.source)}
                         </span>
 
-                        <span className="text-gray-300">
+                        <span className="text-gray-300 text-xs">
                           •
                         </span>
 
                         <span
-                          className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStageClass(
+                          className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold ${getStageClass(
                             detail.stage
                           )}`}
                         >
-                          {getStageLabel(
-                            detail.stage
-                          )}
+                          {getStageLabel(detail.stage)}
                         </span>
 
                         <span
-                          className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusClass(
+                          className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold ${getStatusClass(
                             detail.status
                           )}`}
                         >
@@ -891,82 +888,101 @@ export default function InquiryLeads({
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  {/* Actions */}
+                  <div className="flex gap-1.5 items-center justify-center sm:gap-2 shrink-0">
+                    {/* Call */}
                     <button
                       type="button"
-                      onClick={() =>
-                        openPhone(detail.phone)
-                      }
+                      onClick={() => openPhone(detail.phone)}
                       disabled={!detail.phone}
-                      className="w-11 h-11 rounded-xl bg-[#D01132]/10 hover:bg-[#D01132]/20 flex items-center justify-center disabled:opacity-40"
+                      className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-[#D01132]/10 hover:bg-[#D01132]/20 flex items-center justify-center disabled:opacity-40 transition"
                       title="Call"
                     >
                       <Phone
-                        size={20}
-                        className="text-[#D01132]"
+                        size={17}
+                        className="sm:w-5 sm:h-5 text-[#D01132]"
                       />
                     </button>
 
+                    {/* WhatsApp */}
                     <button
                       type="button"
-                      onClick={() =>
-                        openWhatsapp(detail)
-                      }
-                      disabled={
-                        !detail.whatsapp &&
-                        !detail.phone
-                      }
-                      className="w-11 h-11 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center disabled:opacity-40"
+                      onClick={() => openWhatsapp(detail)}
+                      disabled={!detail.whatsapp && !detail.phone}
+                      className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center disabled:opacity-40 transition"
                       title="WhatsApp"
                     >
                       <FaWhatsapp
-                        size={23}
-                        className="text-green-600"
+                        size={20}
+                        className="sm:w-[23px] sm:h-[23px] text-green-600"
+                      />
+                    </button>
+
+                    {/* Email */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!detail.email) return;
+                        window.location.href = `mailto:${detail.email}`;
+                      }}
+                      disabled={!detail.email}
+                      className="w-9 h-9 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-cyan-100 hover:bg-cyan-200 flex items-center justify-center disabled:opacity-40 transition"
+                      title="Email"
+                    >
+                      <Mail
+                        size={17}
+                        className="sm:w-5 sm:h-5 text-cyan-600"
                       />
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Basic Information */}
-              <section className="mb-5">
-                <div className="flex items-center gap-2 mb-3">
+              {/* Contact Information */}
+              <section className="mb-3 sm:mb-5">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <User
-                    size={18}
-                    className="text-[#074977]"
+                    size={16}
+                    className="sm:w-[18px] sm:h-[18px] text-[#074977]"
                   />
 
-                  <h3 className="font-semibold text-gray-800">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800">
                     Contact Information
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <LeadInfo
-                    icon={User}
-                    label="Name"
-                    value={detail.name}
-                  />
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <div className="sm:flex hidden">
+                    <LeadInfo
+                      icon={User}
+                      label="Name"
+                      value={detail.name}
+                    />
+                  </div>
 
-                  <LeadInfo
-                    icon={Phone}
-                    label="Phone"
-                    value={detail.phone}
-                    iconClass="text-[#D01132]"
-                    bgClass="bg-red-100"
-                  />
+                  <div className="col-span-2 sm:col-span-1">
+                    <LeadInfo
+                      icon={Phone}
+                      label="Phone"
+                      value={detail.phone}
+                      iconClass="text-[#D01132]"
+                      bgClass="bg-red-100"
+                    />
+                  </div>
 
-                  <LeadInfo
-                    icon={Mail}
-                    label="Email"
-                    value={detail.email}
-                    iconClass="text-cyan-600"
-                    bgClass="bg-cyan-100"
-                  />
+                  <div className="col-span-2 sm:col-span-1">
+                    <LeadInfo
+                      icon={Mail}
+                      label="Email"
+                      value={detail.email}
+                      iconClass="text-cyan-600"
+                      bgClass="bg-cyan-100"
+                    />
+                  </div>
 
                   <LeadInfo
                     icon={Building2}
-                    label="Company Name"
+                    label="Company"
                     value={detail.companyName}
                     iconClass="text-indigo-600"
                     bgClass="bg-indigo-100"
@@ -991,19 +1007,19 @@ export default function InquiryLeads({
               </section>
 
               {/* Lead Information */}
-              <section className="mb-5">
-                <div className="flex items-center gap-2 mb-3">
+              <section className="mb-3 sm:mb-5">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <BriefcaseBusiness
-                    size={18}
-                    className="text-[#074977]"
+                    size={16}
+                    className="sm:w-[18px] sm:h-[18px] text-[#074977]"
                   />
 
-                  <h3 className="font-semibold text-gray-800">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800">
                     Lead Information
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <LeadInfo
                     icon={Building2}
                     label="Product"
@@ -1015,9 +1031,7 @@ export default function InquiryLeads({
                   <LeadInfo
                     icon={IndianRupee}
                     label="Price Range"
-                    value={formatCurrency(
-                      detail.priceRange
-                    )}
+                    value={formatCurrency(detail.priceRange)}
                     iconClass="text-green-600"
                     bgClass="bg-green-100"
                   />
@@ -1025,9 +1039,7 @@ export default function InquiryLeads({
                   <LeadInfo
                     icon={CircleDollarSign}
                     label="Deal Value"
-                    value={formatCurrency(
-                      detail.dealValue
-                    )}
+                    value={formatCurrency(detail.dealValue)}
                     iconClass="text-green-600"
                     bgClass="bg-green-100"
                   />
@@ -1035,9 +1047,7 @@ export default function InquiryLeads({
                   <LeadInfo
                     icon={Tag}
                     label="Source"
-                    value={getSourceLabel(
-                      detail.source
-                    )}
+                    value={getSourceLabel(detail.source)}
                     iconClass="text-blue-600"
                     bgClass="bg-blue-100"
                   />
@@ -1045,9 +1055,7 @@ export default function InquiryLeads({
                   <LeadInfo
                     icon={Activity}
                     label="Stage"
-                    value={getStageLabel(
-                      detail.stage
-                    )}
+                    value={getStageLabel(detail.stage)}
                     iconClass="text-violet-600"
                     bgClass="bg-violet-100"
                   />
@@ -1060,32 +1068,32 @@ export default function InquiryLeads({
                     bgClass="bg-cyan-100"
                   />
 
-                  <LeadInfo
-                    icon={CalendarDays}
-                    label="Expected Closure Date"
-                    value={formatDate(
-                      detail.expectedClosureDate
-                    )}
-                    iconClass="text-orange-600"
-                    bgClass="bg-orange-100"
-                  />
+                  <div className="col-span-2 sm:col-span-1">
+                    <LeadInfo
+                      icon={CalendarDays}
+                      label="Expected Closure"
+                      value={formatDate(detail.expectedClosureDate)}
+                      iconClass="text-orange-600"
+                      bgClass="bg-orange-100"
+                    />
+                  </div>
                 </div>
               </section>
 
               {/* Campaign / Meta */}
-              <section className="mb-5">
-                <div className="flex items-center gap-2 mb-3">
+              <section className="mb-3 sm:mb-5">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <Megaphone
-                    size={18}
-                    className="text-[#074977]"
+                    size={16}
+                    className="sm:w-[18px] sm:h-[18px] text-[#074977]"
                   />
 
-                  <h3 className="font-semibold text-gray-800">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800">
                     Campaign & Source
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <LeadInfo
                     icon={Hash}
                     label="Meta Lead ID"
@@ -1102,13 +1110,15 @@ export default function InquiryLeads({
                     bgClass="bg-purple-100"
                   />
 
-                  <LeadInfo
-                    icon={Megaphone}
-                    label="Campaign Name"
-                    value={detail.campaignName}
-                    iconClass="text-orange-600"
-                    bgClass="bg-orange-100"
-                  />
+                  <div className="col-span-2 sm:col-span-1">
+                    <LeadInfo
+                      icon={Megaphone}
+                      label="Campaign Name"
+                      value={detail.campaignName}
+                      iconClass="text-orange-600"
+                      bgClass="bg-orange-100"
+                    />
+                  </div>
 
                   {detail.platform && (
                     <LeadInfo
@@ -1121,33 +1131,35 @@ export default function InquiryLeads({
                   )}
 
                   {detail.platformEmail && (
-                    <LeadInfo
-                      icon={Mail}
-                      label="Platform Email"
-                      value={detail.platformEmail}
-                      iconClass="text-blue-600"
-                      bgClass="bg-blue-100"
-                    />
+                    <div className="col-span-2 sm:col-span-1">
+                      <LeadInfo
+                        icon={Mail}
+                        label="Platform Email"
+                        value={detail.platformEmail}
+                        iconClass="text-blue-600"
+                        bgClass="bg-blue-100"
+                      />
+                    </div>
                   )}
                 </div>
               </section>
 
               {/* Message */}
               {detail.message && (
-                <section className="mb-5">
-                  <div className="flex items-center gap-2 mb-3">
+                <section className="mb-3 sm:mb-5">
+                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
                     <MessageSquare
-                      size={18}
-                      className="text-[#074977]"
+                      size={16}
+                      className="sm:w-[18px] sm:h-[18px] text-[#074977]"
                     />
 
-                    <h3 className="font-semibold text-gray-800">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-800">
                       Message
                     </h3>
                   </div>
 
-                  <div className="rounded-xl border border-[#074977]/10 bg-gradient-to-br from-[#074977]/5 to-[#D01132]/5 px-4 py-4">
-                    <p className="text-sm text-gray-700 leading-7 whitespace-pre-wrap">
+                  <div className="rounded-lg sm:rounded-xl border border-[#074977]/10 bg-gradient-to-br from-[#074977]/5 to-[#D01132]/5 px-3 py-3 sm:px-4 sm:py-4">
+                    <p className="text-xs sm:text-sm text-gray-700 leading-6 sm:leading-7 whitespace-pre-wrap break-words">
                       {detail.message}
                     </p>
                   </div>
@@ -1156,45 +1168,46 @@ export default function InquiryLeads({
 
               {/* System Information */}
               <section>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <Activity
-                    size={18}
-                    className="text-[#074977]"
+                    size={16}
+                    className="sm:w-[18px] sm:h-[18px] text-[#074977]"
                   />
 
-                  <h3 className="font-semibold text-gray-800">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800">
                     System Information
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <LeadInfo
-                    icon={Hash}
-                    label="Lead ID"
-                    value={detail._id}
-                    iconClass="text-gray-600"
-                    bgClass="bg-gray-100"
-                  />
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <div className="col-span-2 sm:col-span-1">
+                    <LeadInfo
+                      icon={Hash}
+                      label="Lead ID"
+                      value={detail._id}
+                      iconClass="text-gray-600"
+                      bgClass="bg-gray-100"
+                    />
+                  </div>
 
-                  <LeadInfo
-                    icon={User}
-                    label="User ID"
-                    value={
-                      typeof detail.userId ===
-                        "object"
-                        ? detail.userId?._id
-                        : detail.userId
-                    }
-                    iconClass="text-gray-600"
-                    bgClass="bg-gray-100"
-                  />
+                  <div className="col-span-2 sm:col-span-1">
+                    <LeadInfo
+                      icon={User}
+                      label="User ID"
+                      value={
+                        typeof detail.userId === "object"
+                          ? detail.userId?._id
+                          : detail.userId
+                      }
+                      iconClass="text-gray-600"
+                      bgClass="bg-gray-100"
+                    />
+                  </div>
 
                   <LeadInfo
                     icon={CalendarDays}
                     label="Created At"
-                    value={formatDateTime(
-                      detail.createdAt
-                    )}
+                    value={formatDateTime(detail.createdAt)}
                     iconClass="text-blue-600"
                     bgClass="bg-blue-100"
                   />
@@ -1202,9 +1215,7 @@ export default function InquiryLeads({
                   <LeadInfo
                     icon={CalendarDays}
                     label="Last Updated"
-                    value={formatDateTime(
-                      detail.updatedAt
-                    )}
+                    value={formatDateTime(detail.updatedAt)}
                     iconClass="text-green-600"
                     bgClass="bg-green-100"
                   />
@@ -1219,9 +1230,9 @@ export default function InquiryLeads({
             <button
               type="button"
               onClick={() => setDetails(null)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-lg sm:rounded-xl border border-gray-300 bg-white text-sm sm:text-base text-gray-700 font-medium hover:bg-gray-50 transition"
             >
-              <X size={17} />
+              <X size={16} />
               Close
             </button>
           </div>
