@@ -108,6 +108,11 @@ const LeadSchema = new mongoose.Schema({
         default: "open",
     },
 
+    remark: {
+        type: String,
+        trim: true,
+    },
+
     campaignId: String,
     campaignName: String,
 }, { timestamps: true, });

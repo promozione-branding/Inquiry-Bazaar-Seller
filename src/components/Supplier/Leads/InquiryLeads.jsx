@@ -22,9 +22,12 @@ import {
   BriefcaseBusiness,
   CircleDollarSign,
   Megaphone,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import Modal from "@/components/Modal/Modal";
+import Link from "next/link";
 
 export default function InquiryLeads({
   leadsData,
@@ -160,96 +163,6 @@ export default function InquiryLeads({
     window.open(`https://wa.me/${phone}`, "_blank");
   };
 
-  const exportLeads = () => {
-    if (onExportLeads) {
-      onExportLeads();
-      setMenuOpen(false);
-      return;
-    }
-
-    if (!leadsData?.length) {
-      alert("No leads available to export.");
-      return;
-    }
-
-    const headers = [
-      "Name",
-      "Phone",
-      "Email",
-      "Company Name",
-      "GST Number",
-      "Place",
-      "Product",
-      "Message",
-      "Price Range",
-      "Deal Value",
-      "Expected Closure Date",
-      "Source",
-      "Stage",
-      "Status",
-      "Campaign ID",
-      "Campaign Name",
-      "Meta Lead ID",
-      "Created At",
-    ];
-
-    const escapeCsv = (value) => {
-      if (value === null || value === undefined) return "";
-
-      const stringValue = String(value).replace(/"/g, '""');
-
-      return `"${stringValue}"`;
-    };
-
-    const rows = leadsData.map((lead) => [
-      lead.name,
-      lead.phone,
-      lead.email,
-      lead.companyName,
-      lead.gstNumber,
-      lead.place,
-      lead.product,
-      lead.message,
-      lead.priceRange,
-      lead.dealValue,
-      lead.expectedClosureDate
-        ? formatDate(lead.expectedClosureDate)
-        : "",
-      lead.source,
-      lead.stage,
-      lead.status,
-      lead.campaignId,
-      lead.campaignName,
-      lead.metaLeadId,
-      lead.createdAt ? formatDateTime(lead.createdAt) : "",
-    ]);
-
-    const csv = [
-      headers.map(escapeCsv).join(","),
-      ...rows.map((row) => row.map(escapeCsv).join(",")),
-    ].join("\n");
-
-    const blob = new Blob([csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = `leads-${new Date()
-      .toISOString()
-      .slice(0, 10)}.csv`;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
-
-    setMenuOpen(false);
-  };
-
   const LeadInfo = ({
     icon: Icon,
     label,
@@ -288,76 +201,8 @@ export default function InquiryLeads({
 
   return (
     <div className="relative">
-      {/* =========================================================
-          TOP ACTION MENU
-      ========================================================== */}
-      <div className="flex justify-end px-4 py-3 border-b border-gray-200 bg-white">
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((prev) => !prev)}
-            className="w-10 h-10 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 flex items-center justify-center transition"
-            title="More actions"
-          >
-            <MoreVertical
-              size={20}
-              className="text-gray-700"
-            />
-          </button>
-
-          {menuOpen && (
-            <>
-              <button
-                type="button"
-                aria-label="Close menu"
-                className="fixed inset-0 z-40 cursor-default"
-                onClick={() => setMenuOpen(false)}
-              />
-
-              <div className="absolute right-0 top-12 z-50 w-52 rounded-xl border border-gray-200 bg-white shadow-xl overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onAddLead?.();
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 transition"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <Plus
-                      size={17}
-                      className="text-blue-600"
-                    />
-                  </div>
-
-                  <span>Add Lead</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={exportLeads}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 transition border-t border-gray-100"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                    <Download
-                      size={17}
-                      className="text-green-600"
-                    />
-                  </div>
-
-                  <span>Export Leads</span>
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* =========================================================
-          TABLE VIEW
-      ========================================================== */}
       {view === "table" && (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-aut">
           <table className="w-full">
             <thead className="bg-gray-50 sticky top-0">
               <tr>
@@ -365,23 +210,23 @@ export default function InquiryLeads({
                   Name
                 </th>
 
-                <th className="text-left py-4 px-4 font-semibold text-gray-600">
+                <th className="text-left sm:table-cell hidden py-4 px-4 font-semibold text-gray-600">
                   Product
                 </th>
 
-                <th className="text-left py-4 px-4 font-semibold text-gray-600">
+                <th className="text-left sm:table-cell hidden py-4 px-4 font-semibold text-gray-600">
                   Phone
                 </th>
 
-                <th className="text-left py-4 px-4 font-semibold text-gray-600">
+                <th className="text-left py-4 sm:table-cell hidden px-4 font-semibold text-gray-600">
                   Email
                 </th>
 
-                <th className="text-left py-4 px-4 font-semibold text-gray-600">
+                <th className="text-left py-4 sm:table-cell hidden px-4 font-semibold text-gray-600">
                   Stage
                 </th>
 
-                <th className="text-left py-4 px-4 font-semibold text-gray-600">
+                <th className="text-left py-4 sm:table-cell hidden px-4 font-semibold text-gray-600">
                   Time
                 </th>
 
@@ -405,173 +250,223 @@ export default function InquiryLeads({
                     ))}
                   </tr>
                 ))
-              ) : leadsData?.length > 0 ? (
-                leadsData.map((lead, index) => (
-                  <tr
-                    key={lead._id}
-                    className={`border-t border-gray-100 hover:bg-blue-50/40 transition ${index % 2 === 0
-                      ? "bg-white"
-                      : "bg-gray-50/40"
-                      }`}
-                  >
-                    {/* USER */}
-                    <td className="px-2 py-2">
-                      <div className="flex items-center gap-3">
-                        <div className="relative shrink-0">
-                          <div className="w-11 h-11 rounded-xl bg-[#074977]/10 border border-[#074977]/10 flex items-center justify-center">
-                            <User
-                              size={18}
-                              className="text-[#074977]"
-                            />
-                          </div>
-
-                          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white bg-green-500" />
+              ) : leadsData?.length > 0 ? (leadsData.map((lead, index) => (
+                <tr key={lead._id} className={`border-t border-gray-100 hover:bg-blue-50/40 transition ${index % 2 === 0 ? "bg-white" : "bg-gray-50/40"}`}>
+                  {/* USER */}
+                  <td className="px-2 py-2">
+                    <div className="flex items-center gap-3">
+                      <div className="relative shrink-0">
+                        <div className="w-11 h-11 rounded-xl bg-[#074977]/10 border border-[#074977]/10 flex items-center justify-center">
+                          <User
+                            size={18}
+                            className="text-[#074977]"
+                          />
                         </div>
 
-                        <div className="min-w-0">
-                          <h4 className="font-semibold text-gray-800 truncate line-clamp-1 w-40">
-                            {lead.name || "-"}
-                          </h4>
+                        <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white bg-green-500" />
+                      </div>
 
-                          <div className="flex items-center gap-1 mt-1">
-                            <Globe
-                              size={12}
-                              className="text-[#074977]"
-                            />
+                      <div className="min-w-0">
+                        <h4 className="font-semibold text-gray-800 truncate line-clamp-1 sm:w-40">
+                          {lead.name || "-"}
+                        </h4>
 
-                            <span className="text-xs text-gray-500 truncate">
-                              {lead.source
-                                ? getSourceLabel(lead.source)
-                                : lead.platform?.replace(
-                                  "https://",
-                                  ""
-                                ) || "-"}
-                            </span>
-                          </div>
+                        <div className="flex items-center gap-1 mt-1">
+                          <Globe
+                            size={12}
+                            className="text-[#074977]"
+                          />
+
+                          <span className="text-xs text-gray-500 truncate">
+                            {lead.source
+                              ? getSourceLabel(lead.source)
+                              : lead.platform?.replace(
+                                "https://",
+                                ""
+                              ) || "-"}
+                          </span>
                         </div>
                       </div>
-                    </td>
+                    </div>
+                  </td>
 
-                    {/* PRODUCT */}
-                    <td className="px-2 py-2">
-                      {lead.product ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center">
-                            <Building2
-                              size={16}
-                              className="text-indigo-600"
-                            />
-                          </div>
-
-                          <p className="font-medium line-clamp-1 w-40">
-                            {lead.product}
-                          </p>
-                        </div>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-
-                    {/* PHONE */}
-                    <td className="px-2 py-2">
+                  {/* PRODUCT */}
+                  <td className="px-2 py-2 sm:table-cell hidden">
+                    {lead.product ? (
                       <div className="flex items-center gap-2">
-                        <Phone
-                          size={14}
-                          className="text-[#D01132]"
-                        />
+                        <div className="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center">
+                          <Building2
+                            size={16}
+                            className="text-indigo-600"
+                          />
+                        </div>
 
-                        <span className="line-clamp-1 w-40">{lead.phone || "-"}</span>
-                      </div>
-                    </td>
-
-                    {/* EMAIL */}
-                    <td className="px-2 py-2 line-clamp-1 w-40 ">
-                      {lead.email || "-"}
-                    </td>
-
-                    {/* STAGE */}
-                    <td className="px-2 py-2">
-                      <span
-                        className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${getStageClass(
-                          lead.stage
-                        )}`}
-                      >
-                        {getStageLabel(lead.stage)}
-                      </span>
-                    </td>
-
-                    {/* TIME */}
-                    <td className="px-2 py-2">
-                      <div>
-                        <p>
-                          {formatDate(lead.createdAt)}
-                        </p>
-
-                        <p className="text-xs text-gray-500">
-                          {lead.createdAt
-                            ? new Date(
-                              lead.createdAt
-                            ).toLocaleTimeString(
-                              "en-IN"
-                            )
-                            : "-"}
+                        <p className="font-medium line-clamp-1 sm:w-40">
+                          {lead.product}
                         </p>
                       </div>
-                    </td>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
 
-                    {/* ACTIONS */}
-                    <td className="px-2 py-2">
-                      <div className="flex gap-2 justify-center">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setDetails(lead)
-                          }
-                          className="w-10 h-10 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition"
-                          title="View details"
+                  {/* PHONE */}
+                  <td className="px-2 py-2 sm:table-cell hidden">
+                    <div className="flex items-center gap-2">
+                      <Phone
+                        size={14}
+                        className="text-[#D01132]"
+                      />
+
+                      <span className="line-clamp-1 sm:w-40">{lead.phone || "-"}</span>
+                    </div>
+                  </td>
+
+                  {/* EMAIL */}
+                  <td className="px-2 py-2 line-clamp-1 sm:w-40 sm:table-cell hidden">
+                    {lead.email || "-"}
+                  </td>
+
+                  {/* STAGE */}
+                  <td className="px-2 py-2 sm:table-cell hidden">
+                    <span
+                      className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${getStageClass(
+                        lead.stage
+                      )}`}
+                    >
+                      {getStageLabel(lead.stage)}
+                    </span>
+                  </td>
+
+                  {/* TIME */}
+                  <td className="px-2 py-2 sm:table-cell hidden">
+                    <div className="text-nowrap">
+                      <p>
+                        {formatDate(lead.createdAt)}
+                      </p>
+
+                      <p className="text-xs text-gray-500">
+                        {lead.createdAt
+                          ? new Date(
+                            lead.createdAt
+                          ).toLocaleTimeString(
+                            "en-IN"
+                          )
+                          : "-"}
+                      </p>
+                    </div>
+                  </td>
+
+                  {/* ACTIONS */}
+                  <td className="px-2 py-2">
+                    <div className="flex gap-2 justify-center items-center">
+                      <div className="relative">
+                        <button type="button" onClick={() => setMenuOpen((prev) => prev === lead._id ? null : lead._id)}
+                          className={`w-8 h-8 rounded-md border flex items-center justify-center transition ${menuOpen === lead._id
+                            ? "bg-gray-100 border-gray-400"
+                            : "border-gray-300 bg-white hover:bg-gray-50"
+                            }`}
+                          title="More actions"
                         >
-                          <Eye
+                          <MoreVertical
                             size={20}
-                            className="text-blue-600"
+                            className="text-gray-700"
                           />
                         </button>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            openPhone(lead.phone)
-                          }
-                          disabled={!lead.phone}
-                          className="w-10 h-10 rounded-xl bg-[#D01132]/10 hover:bg-[#D01132]/20 flex items-center justify-center transition disabled:opacity-40"
-                          title="Call"
-                        >
-                          <Phone
-                            size={20}
-                            className="text-[#D01132]"
-                          />
-                        </button>
+                        {menuOpen === lead._id && (
+                          <>
+                            {/* BACKDROP */}
+                            <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(null)} />
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            openWhatsapp(lead)
-                          }
-                          disabled={
-                            !lead.whatsapp &&
-                            !lead.phone
-                          }
-                          className="w-10 h-10 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition disabled:opacity-40"
-                          title="WhatsApp"
-                        >
-                          <FaWhatsapp
-                            size={23}
-                            className="text-green-600"
-                          />
-                        </button>
+                            {/* MENU */}
+                            <div className="absolute right-0 top-9 z-50 w-52 rounded-xl border border-gray-200 bg-white shadow-xl overflow-hidden">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setMenuOpen(null);
+                                  setDetails(lead);
+                                }}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-50 transition"
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                  <Eye
+                                    size={17}
+                                    className="text-blue-600"
+                                  />
+                                </div>
+
+                                <span>View Details</span>
+                              </button>
+
+                              <Link href={`/leads/edit/${lead._id}`}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-yellow-50 transition border-t border-gray-100"
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center">
+                                  <Pencil size={17} className="text-yellow-600" />
+                                </div>
+                                <span>Edit Lead</span>
+                              </Link>
+
+                              {/* <button
+                                  type="button"
+                                  onClick={() => {
+                                    setMenuOpen(null);
+                                    onDeleteLead?.(lead);
+                                  }}
+                                  className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition border-t border-gray-100"
+                                >
+                                  <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                                    <Trash2 size={17} className="text-red-600" />
+                                  </div>
+                                  <span>Delete Lead</span>
+                                </button> */}
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setMenuOpen(null);
+                                  openPhone(lead.phone);
+                                }}
+                                disabled={!lead.phone}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 transition border-t border-gray-100 disabled:opacity-40"
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-[#D01132]/10 flex items-center justify-center">
+                                  <Phone
+                                    size={17}
+                                    className="text-[#D01132]"
+                                  />
+                                </div>
+
+                                <span>Call</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setMenuOpen(null);
+                                  openWhatsapp(lead);
+                                }}
+                                disabled={!lead.whatsapp && !lead.phone}
+                                className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 transition border-t border-gray-100 disabled:opacity-40"
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                                  <FaWhatsapp
+                                    size={20}
+                                    className="text-green-600"
+                                  />
+                                </div>
+
+                                <span>WhatsApp</span>
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
-                    </td>
-                  </tr>
-                ))
+                    </div>
+                  </td>
+                </tr>
+              ))
               ) : (
                 <tr>
                   <td colSpan={7}>
@@ -597,9 +492,6 @@ export default function InquiryLeads({
         </div>
       )}
 
-      {/* =========================================================
-          CARD VIEW
-      ========================================================== */}
       {view === "card" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 py-4 px-2">
           {loading ? (
@@ -807,9 +699,6 @@ export default function InquiryLeads({
         </div>
       )}
 
-      {/* =========================================================
-          PAGINATION
-      ========================================================== */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 px-5 py-4 border-t border-gray-200 bg-white">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <p className="text-sm text-gray-500 whitespace-nowrap">
@@ -941,9 +830,6 @@ export default function InquiryLeads({
         )}
       </div>
 
-      {/* =========================================================
-          COMPLETE LEAD DETAILS MODAL
-      ========================================================== */}
       <Modal
         open={!!detail}
         onClose={() => setDetails(null)}
