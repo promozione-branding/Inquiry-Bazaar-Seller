@@ -259,8 +259,8 @@ export default function ProductForm({ activeTab, form, setForm }) {
     );
 }
 
-function Specifications({ form, setForm }) {
 
+function Specifications({ form, setForm }) {
     const handleSpecChange = (index, field, value) => {
         const updated = [...form.specifications];
         updated[index][field] = value;
@@ -273,7 +273,8 @@ function Specifications({ form, setForm }) {
 
     const addSpec = () => {
         const last = form.specifications[form.specifications.length - 1];
-        if (last && (!last.key || !last.value)) {
+
+        if (last && (!last.key.trim() || !last.value.trim())) {
             toast.error("Please fill current specification first");
             return;
         }
@@ -296,6 +297,92 @@ function Specifications({ form, setForm }) {
         }));
     };
 
+    // Handle paste of multiple specifications
+    const handlePaste = (e, index, field) => {
+        const pastedText = e.clipboardData.getData("text");
+
+        // If it's a normal single-line paste, let the input handle it normally
+        if (!pastedText.includes("\n") && !pastedText.includes("\r")) {
+            return;
+        }
+
+        e.preventDefault();
+
+        const lines = pastedText
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+
+        const parsedSpecs = [];
+
+        lines.forEach((line) => {
+            let key = "";
+            let value = "";
+
+            // Format: Key: Value
+            if (line.includes(":")) {
+                const parts = line.split(":");
+
+                key = parts.shift().trim();
+                value = parts.join(":").trim();
+            }
+            // Format: Key - Value
+            else if (line.includes(" - ")) {
+                const parts = line.split(" - ");
+
+                key = parts.shift().trim();
+                value = parts.join(" - ").trim();
+            }
+            // Format: Key    Value
+            else if (/\t+/.test(line)) {
+                const parts = line.split(/\t+/);
+
+                key = parts.shift().trim();
+                value = parts.join(" ").trim();
+            }
+
+            if (key && value) {
+                parsedSpecs.push({
+                    key,
+                    value,
+                });
+            }
+        });
+
+        // Nothing could be parsed
+        if (!parsedSpecs.length) {
+            toast.error(
+                "Use format: Material: Steel"
+            );
+            return;
+        }
+
+        setForm((prev) => {
+            const updated = [...prev.specifications];
+
+            // If current row is empty, use it first
+            const current = updated[index];
+
+            if (
+                current &&
+                !current.key.trim() &&
+                !current.value.trim()
+            ) {
+                updated.splice(index, 1, ...parsedSpecs);
+            } else {
+                // Otherwise add below current row
+                updated.splice(index + 1, 0, ...parsedSpecs);
+            }
+
+            return {
+                ...prev,
+                specifications: updated,
+            };
+        });
+
+        toast.success(`${ parsedSpecs.length } specifications added`);
+    };
+
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
@@ -303,7 +390,11 @@ function Specifications({ form, setForm }) {
                     Specifications
                 </p>
 
-                <button onClick={addSpec} className="text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-lg transition">
+                <button
+                    type="button"
+                    onClick={addSpec}
+                    className="text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-lg transition"
+                >
                     + Add
                 </button>
             </div>
@@ -315,40 +406,80 @@ function Specifications({ form, setForm }) {
             )}
 
             <div className="space-y-3">
-                {form.specifications.map((spec, index) => {
-                    return (
-                        <div key={index} className="grid md:grid-cols-2 gap-3 items-start">
-                            <div>
+                {form.specifications.map((spec, index) => (
+                    <div
+                        key={index}
+                        className="grid md:grid-cols-2 gap-3 items-start"
+                    >
+                        {/* KEY */}
+                        <div>
+                            <Input
+                                label="Key (e.g. Material)"
+                                value={spec.key}
+                                onChange={(e) =>
+                                    handleSpecChange(
+                                        index,
+                                        "key",
+                                        e.target.value
+                                    )
+                                }
+                                onPaste={(e) =>
+                                    handlePaste(e, index, "key")
+                                }
+                            />
+                        </div>
+
+                        {/* VALUE */}
+                        <div className="flex gap-2 items-start">
+                            <div className="flex-1">
                                 <Input
-                                    label="Key (e.g. Material)"
-                                    value={spec.key}
+                                    label="Value (e.g. Steel)"
+                                    value={spec.value}
                                     onChange={(e) =>
-                                        handleSpecChange(index, "key", e.target.value)
+                                        handleSpecChange(
+                                            index,
+                                            "value",
+                                            e.target.value
+                                        )
+                                    }
+                                    onPaste={(e) =>
+                                        handlePaste(e, index, "value")
                                     }
                                 />
                             </div>
 
-                            <div className="flex gap-2 items-start">
-                                <div className="flex-1">
-                                    <Input
-                                        label="Value (e.g. Steel)"
-                                        value={spec.value}
-                                        onChange={(e) =>
-                                            handleSpecChange(index, "value", e.target.value)
-                                        }
-                                    />
-                                </div>
+                            <button
+                                type="button"
+                                onClick={() => removeSpec(index)}
+                                className="mb-1 p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
 
-                                {/* REMOVE BUTTON */}
-                                <button
-                                    onClick={() => removeSpec(index)}
-                                    className="mb-1 p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition"
-                                >
-                                    <X size={16} />
-                                </button>
-                            </div>
-                        </div>);
-                })}
+            {/* PASTE HELP */}
+            <div className="mt-4 rounded-lg bg-gray-50 border border-gray-200 px-3 py-2">
+                <p className="text-xs text-gray-500">
+                    💡 You can paste multiple specifications at once.
+                </p>
+
+                <p className="text-xs text-gray-400 mt-1">
+                    Example:{" "}
+                    <span className="font-medium">
+                        Material: Steel
+                    </span>
+                    {" • "}
+                    <span className="font-medium">
+                        Color: Black
+                    </span>
+                    {" • "}
+                    <span className="font-medium">
+                        Thickness: 5mm
+                    </span>
+                </p>
             </div>
         </div>
     );
