@@ -467,14 +467,14 @@ export async function POST(request) {
                 // 18. PRODUCT
                 // =================================================
 
-                const product = fields["what_products_are_you_interested_in?"] || fields.what_products_are_you_interested_in || fields.product || fields.product_name || fields.interested_product || fields.product_interest || null;
+                const product = fields["what_products_are_you_interested_in?"] || fields.select_product || fields.what_products_are_you_interested_in || fields.product || fields.product_name || fields.interested_product || fields.product_interest || null;
 
 
                 // =================================================
                 // 19. MESSAGE / REQUIREMENT
                 // =================================================
 
-                const message = fields.message || fields.requirement || fields.query || fields.details || fields.comments || fields["what_products_are_you_interested_in?"] || fields.what_products_are_you_interested_in || null;
+                const message = fields.message || fields.Priority || fields.requirement || fields.query || fields.details || fields.comments || fields["what_products_are_you_interested_in?"] || fields.what_products_are_you_interested_in || null;
 
 
                 // =================================================
