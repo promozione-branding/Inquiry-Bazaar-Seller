@@ -6,9 +6,14 @@ import { LayoutGrid, Search, Table, Plus, Download, MoreVertical, RefreshCcw, X,
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { format, startOfDay, endOfDay } from "date-fns";
 import MyDateRangePicker from "@/components/Inputs/Datepicker";
 import { useRouter } from "next/navigation";
+import {
+    startOfDay,
+    endOfDay,
+    subDays,
+    format,
+} from "date-fns";
 
 export default function Leads() {
     const router = useRouter();
@@ -16,15 +21,16 @@ export default function Leads() {
     const [switchButton, setSwitchButton] = useState(false);
     const [moreMenuOpen, setMoreMenuOpen] = useState(false);
     const { user } = useSelector((state) => state.auth);
-    const [filter, setFilter] = useState("today");
-    const [range, setRange] = useState(() => {
+    const getLast30Days = () => {
         const today = new Date();
 
         return {
-            startDate: startOfDay(today),
+            startDate: startOfDay(subDays(today, 29)),
             endDate: endOfDay(today),
         };
-    });
+    };
+    const [filter, setFilter] = useState("custom");
+    const [range, setRange] = useState(getLast30Days);
     const [search, setSearch] = useState("");
     const [view, setView] = useState("table");
     const [trackingData, setTrackingData] = useState([]);
@@ -43,41 +49,44 @@ export default function Leads() {
 
     const getDateFilter = (startDate, endDate) => {
         if (!startDate || !endDate) {
-            return "today";
+            return "thisWeek";
         }
 
-        const selectedStart = format(
-            startDate,
-            "yyyy-MM-dd"
-        );
+        const selectedStart = format(startDate, "yyyy-MM-dd");
+        const selectedEnd = format(endDate, "yyyy-MM-dd");
 
-        const selectedEnd = format(
-            endDate,
-            "yyyy-MM-dd"
-        );
-
-        const today = format(
-            new Date(),
-            "yyyy-MM-dd"
-        );
+        const today = new Date();
+        const todayString = format(today, "yyyy-MM-dd");
 
         const yesterdayDate = new Date();
+        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
-        yesterdayDate.setDate(
-            yesterdayDate.getDate() - 1
-        );
+        const yesterday = format(yesterdayDate, "yyyy-MM-dd");
 
-        const yesterday = format(
-            yesterdayDate,
+        const weekStart = format(
+            startOfWeek(today, { weekStartsOn: 1 }),
             "yyyy-MM-dd"
         );
 
-        // Today
-        if (selectedStart === today && selectedEnd === today) {
+        const weekEnd = format(
+            endOfWeek(today, { weekStartsOn: 1 }),
+            "yyyy-MM-dd"
+        );
+
+        if (
+            selectedStart === weekStart &&
+            selectedEnd === weekEnd
+        ) {
+            return "thisWeek";
+        }
+
+        if (
+            selectedStart === todayString &&
+            selectedEnd === todayString
+        ) {
             return "today";
         }
 
-        // Yesterday
         if (
             selectedStart === yesterday &&
             selectedEnd === yesterday
@@ -85,7 +94,6 @@ export default function Leads() {
             return "yesterday";
         }
 
-        // Custom range
         return "custom";
     };
 
@@ -221,35 +229,59 @@ export default function Leads() {
         fetchTrackLeads();
     }, [user?._id, filter, range.startDate, range.endDate, switchButton,]);
 
-    const handleDateChange = (selection) => {
-        if (
-            !selection?.startDate ||
-            !selection?.endDate
-        ) {
-            return;
+    useEffect(() => {
+        const savedRange = localStorage.getItem("leadsDateRange");
+
+        if (savedRange) {
+            try {
+                const parsed = JSON.parse(savedRange);
+                const startDate = new Date(parsed.startDate);
+                const endDate = new Date(parsed.endDate);
+
+                if (
+                    parsed.startDate &&
+                    parsed.endDate &&
+                    !Number.isNaN(startDate.getTime()) &&
+                    !Number.isNaN(endDate.getTime())
+                ) {
+                    setRange({ startDate, endDate });
+                    return;
+                }
+            } catch {
+                // Use Last 30 Days if saved data is invalid.
+            }
         }
 
-        const startDate = startOfDay(
-            selection.startDate
+        const last30Days = getLast30Days();
+
+        setRange(last30Days);
+        setFilter("custom");
+
+        localStorage.setItem(
+            "leadsDateRange",
+            JSON.stringify({
+                startDate: last30Days.startDate.toISOString(),
+                endDate: last30Days.endDate.toISOString(),
+            })
         );
+    }, []);
 
-        const endDate = endOfDay(
-            selection.endDate
+    const handleDateChange = ({ startDate, endDate }) => {
+        const updatedRange = {
+            startDate: startOfDay(startDate),
+            endDate: endOfDay(endDate),
+        };
+
+        setRange(updatedRange);
+        setFilter("custom");
+
+        localStorage.setItem(
+            "leadsDateRange",
+            JSON.stringify({
+                startDate: updatedRange.startDate.toISOString(),
+                endDate: updatedRange.endDate.toISOString(),
+            })
         );
-
-        setRange({
-            startDate,
-            endDate,
-        });
-
-        // Automatically determine:
-        // today / yesterday / custom
-        const newFilter = getDateFilter(
-            startDate,
-            endDate
-        );
-
-        setFilter(newFilter);
     };
 
     const exportLeads = () => {
