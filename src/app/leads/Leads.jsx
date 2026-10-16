@@ -29,7 +29,7 @@ export default function Leads() {
             endDate: endOfDay(today),
         };
     };
-    const [filter, setFilter] = useState("custom");
+    const [filter, setFilter] = useState("30days");
     const [range, setRange] = useState(getLast30Days);
     const [search, setSearch] = useState("");
     const [view, setView] = useState("table");
@@ -49,44 +49,41 @@ export default function Leads() {
 
     const getDateFilter = (startDate, endDate) => {
         if (!startDate || !endDate) {
-            return "thisWeek";
-        }
-
-        const selectedStart = format(startDate, "yyyy-MM-dd");
-        const selectedEnd = format(endDate, "yyyy-MM-dd");
-
-        const today = new Date();
-        const todayString = format(today, "yyyy-MM-dd");
-
-        const yesterdayDate = new Date();
-        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-
-        const yesterday = format(yesterdayDate, "yyyy-MM-dd");
-
-        const weekStart = format(
-            startOfWeek(today, { weekStartsOn: 1 }),
-            "yyyy-MM-dd"
-        );
-
-        const weekEnd = format(
-            endOfWeek(today, { weekStartsOn: 1 }),
-            "yyyy-MM-dd"
-        );
-
-        if (
-            selectedStart === weekStart &&
-            selectedEnd === weekEnd
-        ) {
-            return "thisWeek";
-        }
-
-        if (
-            selectedStart === todayString &&
-            selectedEnd === todayString
-        ) {
             return "today";
         }
 
+        const selectedStart = format(
+            startDate,
+            "yyyy-MM-dd"
+        );
+
+        const selectedEnd = format(
+            endDate,
+            "yyyy-MM-dd"
+        );
+
+        const today = format(
+            new Date(),
+            "yyyy-MM-dd"
+        );
+
+        const yesterdayDate = new Date();
+
+        yesterdayDate.setDate(
+            yesterdayDate.getDate() - 1
+        );
+
+        const yesterday = format(
+            yesterdayDate,
+            "yyyy-MM-dd"
+        );
+
+        // Today
+        if (selectedStart === today && selectedEnd === today) {
+            return "today";
+        }
+
+        // Yesterday
         if (
             selectedStart === yesterday &&
             selectedEnd === yesterday
@@ -94,6 +91,7 @@ export default function Leads() {
             return "yesterday";
         }
 
+        // Custom range
         return "custom";
     };
 
@@ -229,59 +227,35 @@ export default function Leads() {
         fetchTrackLeads();
     }, [user?._id, filter, range.startDate, range.endDate, switchButton,]);
 
-    useEffect(() => {
-        const savedRange = localStorage.getItem("leadsDateRange");
-
-        if (savedRange) {
-            try {
-                const parsed = JSON.parse(savedRange);
-                const startDate = new Date(parsed.startDate);
-                const endDate = new Date(parsed.endDate);
-
-                if (
-                    parsed.startDate &&
-                    parsed.endDate &&
-                    !Number.isNaN(startDate.getTime()) &&
-                    !Number.isNaN(endDate.getTime())
-                ) {
-                    setRange({ startDate, endDate });
-                    return;
-                }
-            } catch {
-                // Use Last 30 Days if saved data is invalid.
-            }
+    const handleDateChange = (selection) => {
+        if (
+            !selection?.startDate ||
+            !selection?.endDate
+        ) {
+            return;
         }
 
-        const last30Days = getLast30Days();
-
-        setRange(last30Days);
-        setFilter("custom");
-
-        localStorage.setItem(
-            "leadsDateRange",
-            JSON.stringify({
-                startDate: last30Days.startDate.toISOString(),
-                endDate: last30Days.endDate.toISOString(),
-            })
+        const startDate = startOfDay(
+            selection.startDate
         );
-    }, []);
 
-    const handleDateChange = ({ startDate, endDate }) => {
-        const updatedRange = {
-            startDate: startOfDay(startDate),
-            endDate: endOfDay(endDate),
-        };
-
-        setRange(updatedRange);
-        setFilter("custom");
-
-        localStorage.setItem(
-            "leadsDateRange",
-            JSON.stringify({
-                startDate: updatedRange.startDate.toISOString(),
-                endDate: updatedRange.endDate.toISOString(),
-            })
+        const endDate = endOfDay(
+            selection.endDate
         );
+
+        setRange({
+            startDate,
+            endDate,
+        });
+
+        // Automatically determine:
+        // today / yesterday / custom
+        const newFilter = getDateFilter(
+            startDate,
+            endDate
+        );
+
+        setFilter(newFilter);
     };
 
     const exportLeads = () => {
