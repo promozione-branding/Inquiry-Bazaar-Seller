@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState, } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -53,10 +53,19 @@ export default function Edit() {
     const router = useRouter();
     const params = useParams();
     const leadId = params?.id;
+    const searchParams = useSearchParams();
     const [formData, setFormData] = useState(initialFormData);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+
+    const page = Math.max(1, Number(searchParams.get("page")) || 1);
+
+    const limit = [25, 50, 75, 100].includes(
+        Number(searchParams.get("limit"))
+    ) ? Number(searchParams.get("limit")) : 25;
+
+    const backUrl = `/leads?page=${page}&limit=${limit}`;
 
     useEffect(() => {
         if (!leadId) return;
@@ -118,7 +127,7 @@ export default function Edit() {
                     "Failed to load lead"
                 );
 
-                router.push("/leads");
+                router.replace(backUrl);
             } finally {
                 setLoading(false);
             }
@@ -166,8 +175,7 @@ export default function Edit() {
 
             toast.success("Lead updated successfully");
 
-            router.push("/leads");
-            router.refresh();
+            router.replace(backUrl);
         } catch (error) {
             console.error("Update lead error:", error);
 
@@ -194,8 +202,7 @@ export default function Edit() {
 
             toast.success("Lead deleted successfully");
 
-            router.push("/leads");
-            router.refresh();
+            router.replace(backUrl);
         } catch (error) {
             console.error("Delete lead error:", error);
 
@@ -235,7 +242,7 @@ export default function Edit() {
                         <div className="flex items-center gap-3 min-w-0">
                             <button
                                 type="button"
-                                onClick={() => router.back()}
+                                onClick={() => router.push(backUrl)}
                                 className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition"
                             >
                                 <ArrowLeft size={18} />
@@ -272,7 +279,7 @@ export default function Edit() {
                             {/* CANCEL */}
                             <button
                                 type="button"
-                                onClick={() => router.back()}
+                                onClick={() => router.push(backUrl)}
                                 disabled={saving || deleting}
                                 className="h-9 sm:h-10 px-3 sm:px-4 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition disabled:opacity-50"
                             >
@@ -296,7 +303,7 @@ export default function Edit() {
                     </div>
                 </div>
             </div>
-            
+
             <form
                 id="edit-lead-form"
                 onSubmit={handleSubmit}

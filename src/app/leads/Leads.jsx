@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import MyDateRangePicker from "@/components/Inputs/Datepicker";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
     startOfDay,
     endOfDay,
@@ -17,6 +17,7 @@ import {
 
 export default function Leads() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [open, setOpen] = useState(false);
     const [switchButton, setSwitchButton] = useState(false);
     const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -36,8 +37,14 @@ export default function Leads() {
     const [trackingData, setTrackingData] = useState([]);
     const [leadsData, setLeadsData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [limit, setLimit] = useState(25);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(() => {
+        const value = Number(searchParams.get("limit"));
+        return [25, 50, 75, 100].includes(value) ? value : 25;
+    });
+
+    const [currentPage, setCurrentPage] = useState(() => {
+        return Math.max(1, Number(searchParams.get("page")) || 1);
+    });
     const [pagination, setPagination] = useState({
         page: 1,
         limit: 25,
@@ -94,16 +101,6 @@ export default function Leads() {
         // Custom range
         return "custom";
     };
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [
-        filter,
-        search,
-        switchButton,
-        range.startDate,
-        range.endDate,
-    ]);
 
     useEffect(() => {
         if (!user?._id || switchButton) {
@@ -256,6 +253,7 @@ export default function Leads() {
         );
 
         setFilter(newFilter);
+        setCurrentPage(1);
     };
 
     const exportLeads = () => {
@@ -390,6 +388,19 @@ export default function Leads() {
             </div>
         </div>
     );
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        params.set("page", String(currentPage));
+        params.set("limit", String(limit));
+
+        window.history.replaceState(
+            null,
+            "",
+            `/leads?${params.toString()}`
+        );
+    }, [currentPage, limit]);
 
     return (
         <div className="md:p-4 p-3 bg-gray-100 w-full">

@@ -45,6 +45,46 @@ export default function InquiryLeads({
   const [detail, setDetails] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Normalize Indian phone numbers
+  const normalizePhone = (phone) => {
+    if (!phone) return "";
+
+    const digits = String(phone).replace(/\D/g, "");
+
+    // Handle +91, 91, or 0 prefixes
+    if (digits.length === 12 && digits.startsWith("91")) {
+      return digits.slice(2);
+    }
+
+    if (digits.length === 11 && digits.startsWith("0")) {
+      return digits.slice(1);
+    }
+
+    return digits;
+  };
+
+  // Count leads having the same phone number
+  const phoneCounts = useMemo(() => {
+    const counts = {};
+
+    (leadsData || []).forEach((lead) => {
+      const phone = normalizePhone(lead.phone);
+
+      if (phone) {
+        counts[phone] = (counts[phone] || 0) + 1;
+      }
+    });
+
+    return counts;
+  }, [leadsData]);
+
+  // Check whether lead is repeated
+  const isRepeatLead = (lead) => {
+    const phone = normalizePhone(lead?.phone);
+
+    return phone ? phoneCounts[phone] > 1 : false;
+  };
+
   const formatDate = (date) => {
     if (!date) return "-";
 
@@ -267,9 +307,18 @@ export default function InquiryLeads({
                       </div>
 
                       <div className="min-w-0">
-                        <h4 className="font-semibold text-gray-800 truncate line-clamp-1 sm:w-40">
-                          {lead.name || "-"}
-                        </h4>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="font-semibold text-gray-800 truncate max-w-[160px]">
+                            {lead.name || "-"}
+                          </h4>
+
+                          {isRepeatLead(lead) && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-red-100 border border-red-200 px-2 py-0.5 text-[10px] font-bold text-red-700 whitespace-nowrap">
+                              <Activity size={11} />
+                              Duplicate Lead
+                            </span>
+                          )}
+                        </div>
 
                         <div className="flex items-center gap-1 mt-1">
                           <Globe
@@ -399,7 +448,7 @@ export default function InquiryLeads({
                                 <span>View Details</span>
                               </button>
 
-                              <Link href={`/leads/edit/${lead._id}`}
+                              <Link href={`/leads/edit/${lead._id}?page=${currentPage}&limit=${limit}`}
                                 className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-yellow-50 transition border-t border-gray-100"
                               >
                                 <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center">
@@ -657,6 +706,13 @@ export default function InquiryLeads({
                     >
                       {lead.status || "-"}
                     </span>
+
+                    {isRepeatLead(lead) && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-red-100 border border-red-200 px-2 py-0.5 text-[10px] font-bold text-red-700 whitespace-nowrap">
+                        <Activity size={11} />
+                        Duplicate Lead
+                      </span>
+                    )}
                   </div>
 
                   {lead.message && (
@@ -830,20 +886,17 @@ export default function InquiryLeads({
         )}
       </div>
 
-      <Modal
-        open={!!detail}
-        onClose={() => setDetails(null)}
-      >
+      <Modal open={!!detail} onClose={() => setDetails(null)}      >
         <Modal.Header title="Lead Details" />
 
         <Modal.Body>
           {detail && (
             <div className="max-h-[70vh] overflow-y-auto px-0.5 sm:pr-1">
               {/* Header */}
-              <div className="rounded-xl sm:rounded-2xl border border-gray-200 bg-gradient-to-r from-[#074977]/5 to-[#D01132]/5 p-3 sm:p-5 mb-3 sm:mb-5">
+              <div className="rounded-xl sm:rounded-2xl border border-gray-200 bg-gradient-to-r from-[#074977]/5 to-[#D01132]/5 p-3 mb-3 sm:mb-5">
                 <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-3">
                   {/* User */}
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
                     <div className="relative shrink-0">
                       <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#074977]/10 border border-[#074977]/10 flex items-center justify-center">
                         <User
@@ -949,6 +1002,12 @@ export default function InquiryLeads({
                   <h3 className="text-sm sm:text-base font-semibold text-gray-800">
                     Contact Information
                   </h3>
+                  {isRepeatLead(detail) && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 border border-red-200 px-2 py-0.5 text-[10px] font-bold text-red-700 whitespace-nowrap">
+                      <Activity size={11} />
+                      Duplicate Lead
+                    </span>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
