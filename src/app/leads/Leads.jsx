@@ -3,7 +3,7 @@
 import TrackLeads from "@/components/Supplier/Leads/TrackLeads";
 import InquiryLeads from "@/components/Supplier/Leads/InquiryLeads";
 import { LayoutGrid, Search, Table, Plus, Download, MoreVertical, RefreshCcw, X, Upload, MousePointerClick, MessageSquare, } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import MyDateRangePicker from "@/components/Inputs/Datepicker";
@@ -15,7 +15,7 @@ import {
     format,
 } from "date-fns";
 
-export default function Leads() {
+function LeadsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [open, setOpen] = useState(false);
@@ -731,5 +731,19 @@ export default function Leads() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function Leads() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                    <div className="w-10 h-10 border-4 border-gray-200 border-t-[#074977] rounded-full animate-spin" />
+                </div>
+            }
+        >
+            <LeadsContent />
+        </Suspense>
     );
 }
