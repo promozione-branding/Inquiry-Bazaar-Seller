@@ -386,290 +386,126 @@ export async function POST(request) {
                 // =================================================
                 // 13. NORMALIZE FIELD DATA
                 // =================================================
-
                 const fields = {};
 
-
-                for (
-                    const field of
-                    metaLead?.field_data || []
-                ) {
-
-                    if (
-                        !field?.name
-                    ) {
+                for (const field of metaLead?.field_data || []) {
+                    if (!field?.name) {
                         continue;
                     }
 
-                    fields[field.name] =
-                        field.values?.[0] ??
-                        "";
+                    fields[field.name] = field.values?.[0] ?? "";
                 }
 
-
-                console.log(
-                    "📋 NORMALIZED FIELDS:",
-                    fields
-                );
-
+                console.log("📋 NORMALIZED FIELDS:", fields);
 
                 // =================================================
                 // 14. NAME
                 // =================================================
-
-                const name =
-                    fields.full_name ||
-                    fields.name ||
-                    [
-                        fields.first_name,
-                        fields.last_name,
-                    ]
-                        .filter(Boolean)
-                        .join(" ")
-                        .trim() ||
-                    "Facebook Lead";
-
+                const name = fields.full_name || fields.name || [fields.first_name, fields.last_name,].filter(Boolean).join(" ").trim() || "Facebook Lead";
 
                 // =================================================
                 // 15. PHONE
                 // =================================================
-
-                const phone =
-                    fields.phone_number ||
-                    fields.phone ||
-                    fields.mobile ||
-                    fields.mobile_number ||
-                    fields.whatsapp_number ||
-                    null;
-
+                const phone = fields.phone_number || fields.phone || fields.mobile || fields.mobile_number || fields.whatsapp_number || null;
 
                 // =================================================
                 // 16. EMAIL
                 // =================================================
-
-                const email =
-                    fields.email ||
-                    fields.email_address ||
-                    null;
-
+                const email = fields.email || fields.email_address || null;
 
                 // =================================================
                 // 17. COMPANY
                 // =================================================
-
-                const companyName =
-                    fields.company_name ||
-                    fields.company ||
-                    null;
-
+                const companyName = fields.company_name || fields.company || null;
 
                 // =================================================
                 // 18. PRODUCT
                 // =================================================
-
-                const product = fields["what_products_are_you_interested_in?"] || fields.select_product || fields.what_products_are_you_interested_in || fields.product || fields.product_name || fields.interested_product || fields.product_interest || null;
-
+                const product =
+                    fields["what_products_are_you_interested_in?"] ||
+                    fields["what_product_do_you_require?"] ||
+                    fields["product_/_requirement"] ||
+                    fields["product_requirement"] ||
+                    fields["product___requirement"] ||
+                    fields.product_select ||
+                    fields.select_product ||
+                    fields.project_type ||
+                    fields.what_products_are_you_interested_in ||
+                    fields.product ||
+                    fields.product_name ||
+                    fields.interested_product ||
+                    fields.products_interested_in ||
+                    fields.product_interest ||
+                    fields.industry ||
+                    null;
 
                 // =================================================
                 // 19. MESSAGE / REQUIREMENT
                 // =================================================
-
                 const message = fields.message || fields.Priority || fields.requirement || fields.query || fields.details || fields.comments || fields["what_products_are_you_interested_in?"] || fields.what_products_are_you_interested_in || null;
-
 
                 // =================================================
                 // 20. LOCATION
                 // =================================================
-
-                const place =
-                    fields.city ||
-                    fields.location ||
-                    fields.address ||
-                    null;
-
+                const place = fields.city || fields.location || fields.address || null;
 
                 // =================================================
                 // 21. GST
                 // =================================================
-
-                const gstNumber =
-                    fields.gst_number ||
-                    fields.gst_number_ ||
-                    fields.gst ||
-                    null;
-
+                const gstNumber = fields.gst_number || fields.gst_number_ || fields.gst || null;
 
                 // =================================================
                 // 22. CAMPAIGN DATA
                 // =================================================
+                const finalCampaignId = campaignId || metaLead?.campaign_id || null;
+                const finalCampaignName = metaLead?.campaign_name || null;
 
-                const finalCampaignId =
-                    campaignId ||
-                    metaLead?.campaign_id ||
-                    null;
+                const lead = await Lead.create({
+                    userId,
+                    source: "facebook",
+                    metaLeadId: metaLeadId,
+                    name,
+                    phone,
+                    email,
+                    companyName,
+                    gstNumber,
+                    place,
+                    product,
+                    message,
+                    dealValue: 0,
+                    stage: "new",
+                    status: "open",
+                    campaignId: finalCampaignId,
+                    campaignName: finalCampaignName,
 
-                const finalCampaignName =
-                    metaLead?.campaign_name ||
-                    null;
-
-
-                // =================================================
-                // 23. CREATE CRM LEAD
-                // =================================================
-
-                console.log(
-                    "💾 CREATING CRM LEAD..."
-                );
-
-
-                const lead =
-                    await Lead.create({
-
-                        /*
-                         * IMPORTANT:
-                         *
-                         * Your current Integration
-                         * schema is userId based.
-                         *
-                         * Therefore use userId here.
-                         */
-
-                        userId,
-
-                        source:
-                            "facebook",
-
-                        metaLeadId:
-                            metaLeadId,
-
-                        name,
-
-                        phone,
-
-                        email,
-
-                        companyName,
-
-                        gstNumber,
-
-                        place,
-
-                        product,
-
-                        message,
-
-                        dealValue:
-                            0,
-
-                        stage:
-                            "new",
-
-                        status:
-                            "open",
-
-                        campaignId:
-                            finalCampaignId,
-
-                        campaignName:
-                            finalCampaignName,
-
-                        activities: [
-                            {
-                                type:
-                                    "lead_created",
-
-                                description:
-                                    "Lead received from Facebook Lead Ads",
-                            },
-                        ],
-                    });
-
-
-                console.log(
-                    "🎉 CRM LEAD CREATED:",
-                    lead._id
-                );
-
+                    activities: [
+                        {
+                            type: "lead_created",
+                            description: "Lead received from Facebook Lead Ads",
+                        },
+                    ],
+                });
 
                 // =================================================
                 // 24. UPDATE INTEGRATION SYNC
                 // =================================================
-
                 await Integration.updateOne(
-                    {
-                        _id:
-                            integration._id,
-                    },
+                    { _id: integration._id, },
                     {
                         $set: {
-                            lastSyncAt:
-                                new Date(),
-
-                            errorMessage:
-                                null,
+                            lastSyncAt: new Date(),
+                            errorMessage: null,
                         },
-                    }
-                );
-
-
-                console.log(
-                    "✅ META INTEGRATION SYNC UPDATED"
-                );
+                    });
             }
         }
 
-
-        // =================================================
-        // 25. ACKNOWLEDGE META
-        // =================================================
-
-        console.log(
-            "\n✅ META WEBHOOK PROCESSED\n"
-        );
-
-
-        return NextResponse.json(
-            {
-                success: true,
-            },
-            {
-                status: 200,
-            }
-        );
-
+        return NextResponse.json({ success: true, }, { status: 200, });
     } catch (error) {
+        console.error(error);
+        console.error("Message:", error?.message);
+        console.error("Stack:", error?.stack);
 
-        console.error(
-            "\n🔥🔥 META LEAD WEBHOOK ERROR 🔥🔥"
-        );
-
-        console.error(
-            error
-        );
-
-        console.error(
-            "Message:",
-            error?.message
-        );
-
-        console.error(
-            "Stack:",
-            error?.stack
-        );
-
-
-        /*
-         * Return 200 so Meta does not keep
-         * retrying the same webhook.
-         */
-
-        return NextResponse.json(
-            {
-                success: true,
-            },
-            {
-                status: 200,
-            }
-        );
+        return NextResponse.json({ success: true, }, { status: 200, });
     }
 }
