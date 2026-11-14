@@ -239,6 +239,11 @@ export async function syncBrandBnaloLeads(userId) {
                         ? item.name.trim()
                         : "";
 
+                const platform =
+                    typeof item.platform === "string"
+                        ? item.platform.trim()
+                        : "";
+
                 const phone =
                     typeof item.phone === "string"
                         ? item.phone.trim()
@@ -381,7 +386,7 @@ export async function syncBrandBnaloLeads(userId) {
                     await Lead.create({
                         userId,
 
-                        source: "website",
+                        source: platform || "website",
 
                         name:
                             name ||
