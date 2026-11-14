@@ -9,17 +9,17 @@ const LeadSchema = new mongoose.Schema({
 
     source: {
         type: String,
-        enum: [
-            "facebook",
-            "google",
-            "website",
-            "whatsapp",
-            "manual",
-            "indiamart",
-            "tradeindia",
-            "other",
-        ],
-        default: "facebook",
+        // enum: [
+        //     "facebook",
+        //     "google",
+        //     "website",
+        //     "whatsapp",
+        //     "manual",
+        //     "indiamart",
+        //     "tradeindia",
+        //     "other",
+        // ],
+        // default: "facebook",
         index: true,
     },
 
