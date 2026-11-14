@@ -386,7 +386,9 @@ export async function syncBrandBnaloLeads(userId) {
                     await Lead.create({
                         userId,
 
-                        source: platform || "website",
+                        source: "website",
+
+                        platform: platform,
 
                         name:
                             name ||
