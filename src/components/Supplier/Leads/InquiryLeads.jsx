@@ -326,7 +326,7 @@ export default function InquiryLeads({
                             className="text-[#074977] -mt-0.5"
                           />
 
-                          <span title={lead.platform || lead.source || "-"} className="text-[10px] line-clamp-1 w-40 text-gray-500 truncate capitalize">
+                          <span title={lead.platform || lead.source || "-"} className="text-[11px] line-clamp-1 w-40 text-gray-500 truncate">
                             {lead.platform || lead.source}
                           </span>
                         </div>
@@ -356,11 +356,11 @@ export default function InquiryLeads({
 
                   {/* PHONE */}
                   <td className="px-2 py-2 sm:table-cell hidden">
-                    <div className="flex items-center gap-2">
-                      <Phone
+                    <div className="flex items-center gap-">
+                      {/* <Phone
                         size={14}
                         className="text-[#D01132]"
-                      />
+                      /> */}
 
                       <span className="line-clamp-1 sm:w-40">{lead.phone || "-"}</span>
                     </div>
@@ -905,7 +905,7 @@ export default function InquiryLeads({
 
                       <div className="flex flex-wrap items-center gap-1.5 mt-1">
                         <span className="text-xs sm:text-sm text-gray-500 truncate max-w-[120px] sm:max-w-none">
-                          {getSourceLabel(detail.source)}
+                          {detail.platform || getSourceLabel(detail.source)}
                         </span>
 
                         <span className="text-gray-300 text-xs">
