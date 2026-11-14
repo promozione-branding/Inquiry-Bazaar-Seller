@@ -294,9 +294,9 @@ export default function InquiryLeads({
                 <tr key={lead._id} className={`border-t border-gray-100 hover:bg-blue-50/40 transition ${index % 2 === 0 ? "bg-white" : "bg-gray-50/40"}`}>
                   {/* USER */}
                   <td className="px-2 py-2">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
                       <div className="relative shrink-0">
-                        <div className="w-11 h-11 rounded-xl bg-[#074977]/10 border border-[#074977]/10 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-[#074977]/10 border border-[#074977]/10 flex items-center justify-center">
                           <User
                             size={18}
                             className="text-[#074977]"
@@ -308,7 +308,7 @@ export default function InquiryLeads({
 
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="font-semibold text-gray-800 truncate max-w-[160px]">
+                          <h4 title={lead.name || "-"} className="font-semibold text-gray-800 truncate max-w-40">
                             {lead.name || "-"}
                           </h4>
 
@@ -320,19 +320,14 @@ export default function InquiryLeads({
                           )}
                         </div>
 
-                        <div className="flex items-center gap-1 mt-1">
+                        <div className="flex items-center gap-0.5">
                           <Globe
-                            size={12}
-                            className="text-[#074977]"
+                            size={10}
+                            className="text-[#074977] -mt-0.5"
                           />
 
-                          <span className="text-xs text-gray-500 truncate">
-                            {lead.source
-                              ? getSourceLabel(lead.source)
-                              : lead.platform?.replace(
-                                "https://",
-                                ""
-                              ) || "-"}
+                          <span title={lead.platform || lead.source || "-"} className="text-[10px] line-clamp-1 w-40 text-gray-500 truncate capitalize">
+                            {lead.platform || lead.source}
                           </span>
                         </div>
                       </div>
@@ -585,12 +580,7 @@ export default function InquiryLeads({
                           />
 
                           <p className="text-sm text-gray-500 truncate">
-                            {lead.source
-                              ? getSourceLabel(lead.source)
-                              : lead.platform?.replace(
-                                "https://",
-                                ""
-                              ) || "-"}
+                            {lead.platform || lead.source}
                           </p>
                         </div>
                       </div>
@@ -886,7 +876,7 @@ export default function InquiryLeads({
         )}
       </div>
 
-      <Modal open={!!detail} onClose={() => setDetails(null)}      >
+      <Modal open={!!detail} onClose={() => setDetails(null)}>
         <Modal.Header title="Lead Details" />
 
         <Modal.Body>
