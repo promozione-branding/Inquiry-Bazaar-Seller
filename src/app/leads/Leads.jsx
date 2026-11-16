@@ -183,29 +183,32 @@ function LeadsContent() {
     ]);
 
     useEffect(() => {
-        if (!user?._id || !switchButton) {
-            return;
-        }
+        if (!user?._id || !switchButton) return;
+
+        const controller = new AbortController();
 
         const fetchTrackLeads = async () => {
             try {
                 setLoading(true);
-                const params = {
-                    filter,
 
+                const params = {
                     startDate: format(
                         range.startDate,
                         "yyyy-MM-dd"
                     ),
-
                     endDate: format(
                         range.endDate,
                         "yyyy-MM-dd"
                     ),
                 };
 
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/tracking/events/supplier/${user._id}`,
-                    { params, }
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/tracking/events/supplier/${user._id}`,
+                    {
+                        params,
+                        signal: controller.signal,
+                        withCredentials: true,
+                    }
                 );
 
                 if (response.data.success) {
@@ -213,16 +216,33 @@ function LeadsContent() {
                 } else {
                     setTrackingData([]);
                 }
+
             } catch (error) {
-                console.error("Error fetching tracking leads:", error);
+                if (axios.isCancel(error)) return;
+
+                console.error(
+                    "Error fetching tracking leads:",
+                    error
+                );
+
                 setTrackingData([]);
             } finally {
-                setLoading(false);
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchTrackLeads();
-    }, [user?._id, filter, range.startDate, range.endDate, switchButton,]);
+
+        return () => controller.abort();
+
+    }, [
+        user?._id,
+        range.startDate,
+        range.endDate,
+        switchButton,
+    ]);
 
     const handleDateChange = (selection) => {
         if (
