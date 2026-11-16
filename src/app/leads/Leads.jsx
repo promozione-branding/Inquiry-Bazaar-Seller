@@ -205,9 +205,10 @@ function LeadsContent() {
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_LEAD_BACKEND_BASE_URL}/api/tracking/events/supplier/${user._id}`,
                     {
-                        params,
-                        signal: controller.signal,
-                        withCredentials: true,
+                        params: {
+                            startDate: format(range.startDate, "yyyy-MM-dd"),
+                            endDate: format(range.endDate, "yyyy-MM-dd"),
+                        },
                     }
                 );
 
