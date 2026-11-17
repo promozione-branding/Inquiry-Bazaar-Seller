@@ -20,7 +20,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 export default function TrackLeads({ trackingData, search, view, loading, SkeletonCard }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15;
+  const itemsPerPage = 25;
 
   const filteredLeads = useMemo(() => {
     if (!search?.trim()) return trackingData;

@@ -206,15 +206,40 @@ export async function PUT(request, { params }) {
         // ============================================
         // EXPECTED CLOSURE DATE
         // ============================================
+        // ============================================
+        // EXPECTED CLOSURE DATE
+        // ============================================
         if (updateData.expectedClosureDate !== undefined) {
-            if (updateData.expectedClosureDate === "") {
+            const value = updateData.expectedClosureDate;
+
+            if (
+                value === null ||
+                value === "" ||
+                value === 0 ||
+                value === "0" ||
+                value === "1970-01-01"
+            ) {
                 updateData.expectedClosureDate = null;
             } else {
-                const date = new Date(
-                    updateData.expectedClosureDate
-                );
+                if (
+                    typeof value !== "string" ||
+                    !/^\d{4}-\d{2}-\d{2}$/.test(value)
+                ) {
+                    return NextResponse.json(
+                        {
+                            success: false,
+                            message: "Invalid expected closure date",
+                        },
+                        { status: 400 }
+                    );
+                }
 
-                if (Number.isNaN(date.getTime())) {
+                const date = new Date(`${value}T00:00:00.000Z`);
+
+                if (
+                    Number.isNaN(date.getTime()) ||
+                    date.toISOString().slice(0, 10) !== value
+                ) {
                     return NextResponse.json(
                         {
                             success: false,

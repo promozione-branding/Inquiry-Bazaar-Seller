@@ -104,11 +104,30 @@ export default function Edit() {
                             ? String(lead.dealValue)
                             : "",
 
-                    expectedClosureDate: lead.expectedClosureDate
-                        ? new Date(lead.expectedClosureDate)
-                            .toISOString()
-                            .split("T")[0]
-                        : "",
+                    expectedClosureDate: (() => {
+                        const value = lead.expectedClosureDate;
+
+                        if (
+                            value === null ||
+                            value === undefined ||
+                            value === "" ||
+                            value === 0 ||
+                            value === "0"
+                        ) {
+                            return "";
+                        }
+
+                        const date = new Date(value);
+
+                        if (
+                            Number.isNaN(date.getTime()) ||
+                            date.getTime() === 0
+                        ) {
+                            return "";
+                        }
+
+                        return date.toISOString().split("T")[0];
+                    })(),
 
                     stage: lead.stage || "new",
                     status: lead.status || "open",
@@ -170,7 +189,10 @@ export default function Edit() {
                         : Number(formData.dealValue),
 
                 expectedClosureDate:
-                    formData.expectedClosureDate || null,
+                    formData.expectedClosureDate &&
+                        formData.expectedClosureDate !== "1970-01-01"
+                        ? formData.expectedClosureDate
+                        : null,
             });
 
             toast.success("Lead updated successfully");
@@ -231,6 +253,8 @@ export default function Edit() {
             </main>
         );
     }
+
+    console.log(formData.expectedClosureDate)
 
     return (
         <main className="w-full min-w-0 px-2 sm:px-4 md:px-6 py-4 md:py-6">
