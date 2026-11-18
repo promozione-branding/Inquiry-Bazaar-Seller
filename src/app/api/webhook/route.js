@@ -219,6 +219,7 @@ export async function POST(request) {
         const lead = await Leads.create({
             userId: additionalInfo.userId,
             source: "website",
+            platform: body.platform,
             name: body.name,
             phone: body.phone,
             email: body.email,
